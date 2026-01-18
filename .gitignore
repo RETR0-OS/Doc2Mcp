@@ -72,3 +72,5 @@ doc_cache.json
 
 web/.next/
 */node_modules/
+
+*.db
