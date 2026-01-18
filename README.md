@@ -1,86 +1,93 @@
 # Doc2MCP
 
-An MCP (Model Context Protocol) server that automatically converts API documentation URLs into callable tools with Arize Phoenix observability. Built with TypeScript, the MCP SDK, OpenTelemetry tracing, and Zod schema validation.
+🤖 An **agentic MCP server** that intelligently converts ANY documentation into callable tools using Google Gemini AI. No hard-coded parsers - the AI figures it out!
 
 ## Features
 
-- 🔄 **Multi-Format Support**: Parses OpenAPI/Swagger, HTML, and Markdown documentation
-- 🛠️ **Automatic Tool Generation**: Creates callable MCP tools from API endpoints
-- 📊 **Arize Observability**: Full OpenTelemetry tracing with documentation lineage
-- ✅ **Schema Validation**: Generates Zod schemas for runtime type safety
-- 🎯 **Type-Safe**: Complete TypeScript implementation with strict typing
-- ⚡ **Production Ready**: Error handling, logging, and deployment configurations
+- 🧠 **AI-Powered**: Uses Gemini 2.0 Flash to intelligently understand documentation
+- 🌐 **Universal**: Works with REST APIs, GraphQL, libraries, frameworks - any web documentation
+- 🔄 **Auto-Discovery**: Intelligently finds and scrapes related documentation pages
+- 🛠️ **Smart Tools**: Generates meaningful MCP tools with proper schemas automatically
+- 📊 **Arize Phoenix Observability**: Full OpenTelemetry tracing with tool execution tracking
+- ⚡ **Production Ready**: Error handling, logging, and full tracing support
 
-## Architecture
-
-Doc2MCP follows a 5-phase implementation:
-
-1. **Documentation Parsing**: Supports OpenAPI/Swagger (JSON/YAML), HTML, and Markdown
-2. **Tool Generation**: Generates Zod schemas and creates callable tools
-3. **Arize Integration**: OpenTelemetry tracing with source lineage tracking
-4. **MCP Server**: MCP SDK-based server with stdio transport
-5. **Testing & Deployment**: Comprehensive tests and deployment options
-
-## Installation
+## Quick Start
 
 ```bash
-npm install
-npm run build
+# Install dependencies
+pip install -r requirements.txt
+
+# Set your API key and documentation URL
+export GEMINI_API_KEY="your-gemini-api-key"
+export DOC_URLS="https://jsonplaceholder.typicode.com/"
+
+# Run the server
+python3 src/python/server.py
 ```
 
-## Usage
+## How It Works
 
-### Running the Server
+1. **Scrape** 📡 - Fetches documentation pages using BeautifulSoup
+2. **Discover** 🔍 - Finds related documentation pages automatically
+3. **Analyze** 🧠 - Gemini understands API structure and purpose
+4. **Extract** 🔧 - AI identifies endpoints, functions, and parameters
+5. **Generate** 🛠️ - Creates MCP tools with proper input schemas
+6. **Execute** ⚡ - Tools make real API calls or provide documentation info
 
-```bash
-# Set documentation URLs
-export DOC_URLS="https://api.example.com/openapi.json,https://docs.example.com/api"
+## Examples
 
-# Optional: Configure Arize Phoenix tracing
-export TRACING_ENABLED=true
-export ARIZE_ENDPOINT="http://localhost:6006/v1/traces"
-export ARIZE_API_KEY="your-api-key"
+### JSONPlaceholder API
+Successfully generated 14 tools including:
+- `get_posts` - Retrieve all posts
+- `get_post_by_id` - Get specific post
+- `create_post` - Create new post
+- `update_post` - Update post
+- And more!
 
-# Start the server
-npm start
-```
+### Any Documentation
+Works with:
+- REST APIs (any format)
+- GraphQL APIs
+- JavaScript libraries (React, Vue, etc.)
+- Python frameworks (FastAPI, Flask, etc.)
+- Any web-based API documentation
 
-### Using with MCP Clients
+## VS Code Integration
 
-Add to your MCP client configuration (e.g., Claude Desktop):
+Add to your MCP client configuration (e.g., Claude Desktop or VS Code):
 
 ```json
 {
   "mcpServers": {
     "doc2mcp": {
-      "command": "node",
-      "args": ["/path/to/doc2mcp/dist/index.js"],
+      "command": "python3",
+      "args": ["/path/to/doc2mcp/src/python/server.py"],
       "env": {
-        "DOC_URLS": "https://petstore.swagger.io/v2/swagger.json",
-        "TRACING_ENABLED": "true"
+        "DOC_URLS": "https://petstore.swagger.io/v2/swagger.json"
       }
     }
   }
 }
 ```
 
-### Development Mode
+### Configuration
 
-```bash
-npm run dev
-```
+The server uses environment variables for configuration:
+
+- `DOC_URLS`: Comma-separated list of OpenAPI/Swagger spec URLs
+- Phoenix endpoint is automatically set to `http://localhost:6006/v1/traces`
 
 ## Supported Documentation Formats
 
-### OpenAPI/Swagger
-
-Supports OpenAPI 3.0+ and Swagger 2.0 specifications in JSON or YAML format:
+### OpenAPI 3.0
 
 ```yaml
 openapi: 3.0.0
 info:
   title: Sample API
   version: 1.0.0
+servers:
+  - url: https://api.example.com
 paths:
   /users:
     get:
@@ -90,94 +97,87 @@ paths:
           in: query
           schema:
             type: integer
+      responses:
+        '200':
+          description: Success
 ```
 
-### HTML Documentation
+### Swagger 2.0
 
-Extracts API endpoints from HTML documentation:
-
-```html
-<h2>GET /api/users</h2>
-<p>Retrieves a list of users</p>
-<code>GET /api/users?limit=10</code>
+```yaml
+swagger: '2.0'
+info:
+  title: Sample API
+  version: 1.0.0
+host: api.example.com
+schemes:
+  - https
+paths:
+  /users:
+    get:
+      summary: List users
+      parameters:
+        - name: limit
+          in: query
+          type: integer
 ```
 
-### Markdown Documentation
-
-Parses API endpoints from Markdown files:
-
-```markdown
-## GET /api/users
-
-Retrieves a list of users.
-
-Parameters:
-- `limit` (number): Maximum number of users to return
-```
-
-## Observability
+## Observability with Arize Phoenix
 
 Doc2MCP integrates with Arize Phoenix for comprehensive observability:
 
 ### Tracing Features
 
 - **Tool Execution Spans**: Every tool call creates a span with full context
-- **Documentation Lineage**: Tracks which documentation generated each tool
+- **Tool Metadata**: Tracks tool name, arguments, and execution details
 - **Error Tracking**: Automatic error recording and exception tracking
-- **Performance Metrics**: Request duration and success rates
+- **Performance Metrics**: Request duration and HTTP status codes
 
 ### Span Attributes
 
 Each tool execution includes:
 
-- `tool.name`: Generated tool name
-- `tool.source_url`: Original documentation URL
-- `tool.source_type`: Documentation format (openapi/html/markdown)
-- `tool.endpoint.path`: API endpoint path
-- `tool.endpoint.method`: HTTP method
-- `tool.args`: Input arguments
-- `tool.success`: Execution status
+- `tool.name`: MCP tool name
+- `tool.args`: Input arguments (JSON)
+- `http.url`: Full API request URL
+- `http.method`: HTTP method (GET, POST, etc.)
 - `http.status_code`: Response status code
+- Error information (if any)
 
 ### Running Arize Phoenix
 
 ```bash
 # Using Docker
-docker run -p 6006:6006 arizephoenix/phoenix:latest
+docker run -p 6006:6006 -p 4317:4317 arizephoenix/phoenix:latest
 
-# Or install locally
-pip install arize-phoenix
-phoenix serve
+# Visit the UI
+open http://localhost:6006
 ```
 
-Visit http://localhost:6006 to view traces.
+The server automatically sends traces to `http://localhost:6006/v1/traces`.
 
 ## Tool Generation
 
-Doc2MCP automatically generates tools with:
+Doc2MCP automatically generates tools from OpenAPI operations:
 
-### Zod Schema Validation
+### Schema Conversion
 
-```typescript
-// Generated schema for a user endpoint
-z.object({
-  userId: z.string().describe('User ID'),
-  limit: z.number().optional().describe('Results per page'),
-})
-```
+- OpenAPI parameters → MCP input schema properties
+- Path parameters: required string fields
+- Query parameters: optional fields with appropriate types
+- Request body: structured as nested objects
 
 ### Tool Metadata
 
 Each tool includes:
-- Name (auto-generated or from operationId)
-- Description (from documentation)
-- Input schema (JSON Schema from Zod)
-- Handler function (executes API call)
-- Metadata (source, endpoint, generation time)
+- Name (from operationId or auto-generated)
+- Description (from operation summary/description)
+- Input schema (converted from OpenAPI parameters)
+- Handler function (executes HTTP request)
 
 ### Example Tool
 
-For an endpoint `GET /users/{userId}`:
+For an endpoint `GET /pet/{petId}`:
 
 ```json
 {
@@ -208,55 +208,37 @@ For an endpoint `GET /users/{userId}`:
 
 Doc2MCP includes comprehensive error handling:
 
-- **Network Errors**: Timeouts, connection failures
-- **Parsing Errors**: Invalid documentation formats
-- **Validation Errors**: Schema validation failures
+- **Network Errors**: Timeouts, connection failures when fetching specs
+- **Parsing Errors**: Invalid OpenAPI/Swagger formats
 - **API Errors**: HTTP errors from target APIs
+- **Validation Errors**: Missing required parameters
 
 All errors are:
 - Logged to stderr
-- Tracked in OpenTelemetry spans
-- Returned as structured error responses
+- Tracked in OpenTelemetry spans with error attributes
+- Returned as structured error responses to the MCP client
 
 ## Project Structure
 
 ```
 doc2mcp/
 ├── src/
-│   ├── parsers/           # Documentation parsers
-│   │   ├── openapi-parser.ts
-│   │   ├── html-parser.ts
-│   │   ├── markdown-parser.ts
-│   │   └── index.ts
-│   ├── generators/        # Tool and schema generators
-│   │   ├── schema-generator.ts
-│   │   └── tool-generator.ts
-│   ├── observability/     # OpenTelemetry integration
-│   │   └── tracing.ts
-│   ├── server/           # MCP server implementation
-│   │   └── index.ts
-│   ├── types/            # TypeScript type definitions
-│   │   └── index.ts
-│   ├── utils/            # Utility functions
-│   │   └── helpers.ts
-│   └── index.ts          # Main entry point
-├── dist/                 # Compiled JavaScript
-├── package.json
-├── tsconfig.json
+│   └── python/
+│       ├── openapi_parser.py  # OpenAPI/Swagger parser
+│       └── server.py           # MCP server with tracing
+├── requirements.txt            # Python dependencies
+├── .env                       # Environment configuration
 └── README.md
 ```
 
 ## Development
 
-### Building
+### Requirements
 
-```bash
-npm run build
-```
+- Python 3.8+
+- pip
 
-### Linting
-
-```bash
+### Setup
 npm run lint
 ```
 
@@ -274,15 +256,26 @@ npm test
 
 ## Deployment Options
 
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the server
+python src/python/server.py
+```
+
+## Deployment
+
 ### Docker
 
 ```dockerfile
-FROM node:20-alpine
+FROM python:3.11-slim
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --production
-COPY dist ./dist
-CMD ["node", "dist/index.js"]
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY src/python ./src/python
+ENV DOC_URLS="https://petstore.swagger.io/v2/swagger.json"
+CMD ["python", "src/python/server.py"]
 ```
 
 ### systemd Service
@@ -296,19 +289,12 @@ After=network.target
 Type=simple
 User=doc2mcp
 WorkingDirectory=/opt/doc2mcp
-ExecStart=/usr/bin/node /opt/doc2mcp/dist/index.js
+ExecStart=/usr/bin/python3 /opt/doc2mcp/src/python/server.py
 Environment="DOC_URLS=https://api.example.com/openapi.json"
-Environment="TRACING_ENABLED=true"
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
-```
-
-### PM2
-
-```bash
-pm2 start dist/index.js --name doc2mcp
 ```
 
 ## Examples
@@ -317,42 +303,38 @@ pm2 start dist/index.js --name doc2mcp
 
 ```bash
 export DOC_URLS="https://petstore.swagger.io/v2/swagger.json"
-npm start
+python src/python/server.py
 ```
 
 Generated tools:
 - `getPetById` - Find pet by ID
-- `addPet` - Add a new pet
+- `addPet` - Add a new pet to the store
 - `updatePet` - Update an existing pet
 - `deletePet` - Deletes a pet
+- `getInventory` - Returns pet inventories by status
+- `getUserByName` - Get user by username
+- And more...
 
-### GitHub API
-
-```bash
-export DOC_URLS="https://api.github.com/openapi.json"
-npm start
-```
-
-### Multiple APIs
+### Multiple OpenAPI Specs
 
 ```bash
-export DOC_URLS="https://api1.example.com/openapi.json,https://api2.example.com/docs"
-npm start
+export DOC_URLS="https://api1.example.com/openapi.json,https://api2.example.com/swagger.json"
+python src/python/server.py
 ```
 
 ## Limitations
 
-- HTML/Markdown parsing is heuristic-based and may not capture all endpoints
-- Authentication/authorization must be handled by the API itself or via headers
-- Large documentation files may take time to parse
-- Some complex OpenAPI features (allOf, oneOf, etc.) use simplified schemas
+- Currently supports OpenAPI/Swagger specifications only
+- Authentication/authorization must be handled by the API itself
+- Large specifications may increase server startup time
+- Request bodies are currently basic object conversions
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests for new functionality
+4. Test with different OpenAPI specifications
 5. Submit a pull request
 
 ## License
@@ -365,8 +347,9 @@ For issues and feature requests, please use the GitHub issue tracker.
 
 ## Acknowledgments
 
-- Built with [MCP SDK](https://github.com/modelcontextprotocol/sdk)
+- Built with [MCP SDK (Python)](https://github.com/modelcontextprotocol/python-sdk)
 - Observability by [Arize Phoenix](https://phoenix.arize.com/)
+- OpenTelemetry for tracing
 - Schema validation with [Zod](https://zod.dev/)
 - OpenAPI parsing with [yaml](https://www.npmjs.com/package/yaml)
 - HTML parsing with [cheerio](https://cheerio.js.org/)
