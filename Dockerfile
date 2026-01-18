@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y \
 
 # Copy pyproject.toml and install dependencies
 COPY pyproject.toml .
+# Include README so build backends (hatchling) can find the project's long description
+COPY README.md .
 RUN pip install --no-cache-dir -e .
 
 # Copy application code
