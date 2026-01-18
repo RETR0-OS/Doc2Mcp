@@ -32,8 +32,11 @@ def init_tracing(service_name: str = "doc2mcp") -> Any:
     """Initialize Arize Phoenix tracing.
 
     This sets up OpenTelemetry tracing with Phoenix as the backend.
-    If PHOENIX_API_KEY is set, it connects to cloud Phoenix.
-    Otherwise, it starts a local Phoenix instance.
+    
+    Configuration options (in priority order):
+    1. PHOENIX_API_KEY + PHOENIX_COLLECTOR_ENDPOINT: Cloud Phoenix
+    2. OTEL_EXPORTER_OTLP_ENDPOINT: External Phoenix/OTLP collector (e.g., Docker)
+    3. No env vars: Start local Phoenix instance
 
     Args:
         service_name: Name of the service for tracing.
@@ -64,16 +67,25 @@ def init_tracing(service_name: str = "doc2mcp") -> Any:
 
     # Check for cloud Phoenix configuration
     phoenix_api_key = os.environ.get("PHOENIX_API_KEY")
-    collector_endpoint = os.environ.get(
-        "PHOENIX_COLLECTOR_ENDPOINT", "https://app.phoenix.arize.com"
-    )
+    collector_endpoint = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT")
+    otel_endpoint = os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT")
 
     if phoenix_api_key:
         # Use cloud Phoenix
+        endpoint = collector_endpoint or "https://app.phoenix.arize.com"
+        logger.info(f"Connecting to cloud Phoenix at {endpoint}")
         tracer_provider = register(
             project_name=service_name,
-            endpoint=collector_endpoint,
+            endpoint=endpoint,
             headers={"api_key": phoenix_api_key},
+        )
+    elif otel_endpoint or collector_endpoint:
+        # Use external Phoenix/OTLP collector (e.g., Docker container)
+        endpoint = otel_endpoint or collector_endpoint
+        logger.info(f"Connecting to external Phoenix/OTLP collector at {endpoint}")
+        tracer_provider = register(
+            project_name=service_name,
+            endpoint=endpoint,
         )
     else:
         # Start local Phoenix instance with stable storage path
@@ -83,11 +95,14 @@ def init_tracing(service_name: str = "doc2mcp") -> Any:
         # Set env var for Phoenix to use (it reads PHOENIX_WORKING_DIR)
         os.environ["PHOENIX_WORKING_DIR"] = str(phoenix_dir.absolute())
 
+        logger.info(f"Starting local Phoenix at {phoenix_dir.absolute()}")
         # use_temp_dir=False makes Phoenix use PHOENIX_WORKING_DIR for SQLite storage
         px.launch_app(use_temp_dir=False)
         tracer_provider = register(project_name=service_name)
 
     _tracer = trace.get_tracer(service_name)
+    logger.info(f"Tracing initialized for {service_name}")
+    return _tracer
     return _tracer
 
 

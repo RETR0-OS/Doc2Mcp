@@ -98,27 +98,41 @@ async def list_tools() -> list[Tool]:
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Handle tool calls from MCP clients."""
     logger.info(f"call_tool: name={name}, _agent={_agent is not None}, _registry={_registry is not None}")
-    agent = get_agent()
+    
+    with trace_mcp_call(name, arguments) as span:
+        agent = get_agent()
 
-    if name == "search_docs":
-        logger.info(f"Searching docs for '{arguments.get('tool_name')}': {arguments.get('query')}")
-        return await handle_search_docs(agent, arguments)
-    elif name == "list_available_tools":
-        return await handle_list_tools(agent, _registry)
-    elif _registry and _registry.get_tool(name):
-        # Handle auto-generated tool call
-        logger.info(f"Fetching documentation: {name}")
-        content = await _registry.get_tool_content(name)
-        if content:
-            tool = _registry.get_tool(name)
-            return [TextContent(
-                type="text",
-                text=f"# {tool.name}\n\nSource: {tool.url}\n\n{content}"
-            )]
+        if name == "search_docs":
+            logger.info(f"Searching docs for '{arguments.get('tool_name')}': {arguments.get('query')}")
+            result = await handle_search_docs(agent, arguments)
+            if span:
+                span.set_attribute("mcp.search_tool", arguments.get('tool_name', ''))
+                span.set_attribute("mcp.search_query", arguments.get('query', ''))
+            return result
+        elif name == "list_available_tools":
+            return await handle_list_tools(agent, _registry)
+        elif _registry and _registry.get_tool(name):
+            # Handle auto-generated tool call
+            logger.info(f"Fetching documentation: {name}")
+            content = await _registry.get_tool_content(name)
+            if content:
+                tool = _registry.get_tool(name)
+                if span:
+                    span.set_attribute("mcp.doc_tool", name)
+                    span.set_attribute("mcp.doc_url", tool.url)
+                    span.set_attribute("mcp.content_length", len(content))
+                return [TextContent(
+                    type="text",
+                    text=f"# {tool.name}\n\nSource: {tool.url}\n\n{content}"
+                )]
+            else:
+                if span:
+                    span.set_attribute("mcp.status", "not_found")
+                return [TextContent(type="text", text=f"Failed to fetch documentation for {name}")]
         else:
-            return [TextContent(type="text", text=f"Failed to fetch documentation for {name}")]
-    else:
-        return [TextContent(type="text", text=f"Unknown tool: {name}")]
+            if span:
+                span.set_attribute("mcp.status", "unknown_tool")
+            return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
 
 async def run_server() -> None:
