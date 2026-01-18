@@ -15,9 +15,9 @@ interface Job {
   progress: number
   logs: string
   error: string | null
-  startedAt: Date | null
-  completedAt: Date | null
-  createdAt: Date
+  startedAt: string | null
+  completedAt: string | null
+  createdAt: string
 }
 
 export function JobsList({ jobs: initialJobs }: { jobs: Job[] }) {

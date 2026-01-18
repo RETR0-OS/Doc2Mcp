@@ -15,8 +15,8 @@ interface Tool {
   description: string
   sources: string
   enabled: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
 }
 
 export function ToolsList({ tools, userId }: { tools: Tool[]; userId: string }) {

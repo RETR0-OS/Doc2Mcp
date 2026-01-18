@@ -20,11 +20,19 @@ export default async function JobsPage() {
     })
   }
 
-  const jobs = await prisma.job.findMany({
+  const jobsRaw = await prisma.job.findMany({
     where: { userId: dbUser.id },
     orderBy: { createdAt: 'desc' },
     take: 50,
   })
+
+  // Serialize dates for client component
+  const jobs = jobsRaw.map(job => ({
+    ...job,
+    createdAt: job.createdAt.toISOString(),
+    startedAt: job.startedAt?.toISOString() ?? null,
+    completedAt: job.completedAt?.toISOString() ?? null,
+  }))
 
   return (
     <div className="space-y-6">

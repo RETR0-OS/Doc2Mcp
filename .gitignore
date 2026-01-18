@@ -69,3 +69,6 @@ phoenix_data/
 
 # Doc2MCP cache
 doc_cache.json
+
+web/.next/
+*/node_modules/
