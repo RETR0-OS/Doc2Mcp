@@ -85,13 +85,15 @@ services:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - REDIS_URL=redis://redis:6379
       - DOC2MCP_CACHE_DIR=/app/.doc2mcp_cache
+      - DOC2MCP_API_URL=http://web:3000
+      - DOC2MCP_USE_API=true
     volumes:
       - ./doc2mcp:/app/doc2mcp
       - ./doc_cache.json:/app/doc_cache.json
-      - ./tools.yaml:/app/tools.yaml
       - ./.doc2mcp_cache:/app/.doc2mcp_cache
     depends_on:
       - redis
+      - web
     networks:
       - doc2mcp
     restart: "no"
