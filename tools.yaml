@@ -51,3 +51,12 @@ settings:
 
   # Default timeout for web requests (in seconds)
   request_timeout: 30
+
+  # Sitemap index settings for faster URL lookup
+  sitemap_index:
+    enabled: true
+    ttl: 86400  # Refresh index after 24 hours
+    max_urls_per_domain: 1000
+    parallel_fetch_limit: 10
+    min_match_score: 1.0  # Minimum relevance score for URL matches
+    max_url_candidates: 5  # Max URLs to fetch directly from index
