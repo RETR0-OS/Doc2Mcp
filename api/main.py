@@ -181,71 +181,84 @@ async def run_indexing_job(request: IndexRequest):
                 link_result = await web_fetcher.fetch_with_links(link_url, None)
                 cache.put(
                     url=link_result.url,
-                    title=link_resul - uses doc2mcp agent"""
-                    job = jobs[request.job_id]
-                    
-                    try:
-                        await send_job_update(request.job_id, f"Searching for: {request.query}")
-                        job.progress = 10
-                        
-                        # Create a temporary tool config for this search
-                        tool_config = ToolConfig(
-                            name=request.tool_name,
-                            description=request.tool_description,
-                            sources=[]  # Agent will use cached pages
-                        )
-                        
-                        # Update agent config
-                        if agent:
-                            agent.config.tools[request.tool_id] = tool_config
-                            
-                            await send_job_update(request.job_id, "Initializing search agent...")
-                            job.progress = 20
-                            
-                            # Perform the search
-                            await send_job_update(request.job_id, "Exploring documentation...")
-                            result = await agent.search(request.tool_id, request.query)
-                            job.progress = 80
-                            
-                            if result.get("error"):
-                                raise Exception(result["error"])
-                            
-                            await send_job_update(request.job_id, "Synthesizing answer...")
-                            job.progress = 95
-                            
-                            await send_job_update(request.job_id, "Search complete!")
-                            job.progress = 100
-                            job.status = "completed"
-                            job.result = {
-                                "content": result.get("content", "No content found"),
-                                "sources": result.get("sources", []),
-                                "pages_explored": result.get("pages_explored", 0),
-                                "tool": result.get("tool", {})
-                            }
-                        else:
-                            raise Exception("Agent not initialized")
-                        
-                    except Exception as e:
-                        logger.error(f"Search job {request.job_id} failed: {e}")
-                        job.status = "failed"
-                        job.error = str(e)
-                        await send_job_update(request.job_id, f"Searching for: {request.query}")
-                        job.progress = 20
-                        await asyncio.sleep(1)
-                        
-                        job.logs.append("Exploring documentation...")
-                        job.progress = 50
-                        await asyncio.sleep(2)
-                        
-                        job.logs.append("Analyzing content...")
-                        job.progress = 80
-                        await asyncio.sleep(1)
-                        
-                        job.logs.append("Synthesizing answer...")
-                        job.progress = 95
-                        await asyncio.sleep(1)
-                        
-                        job.logs.append("Search complete!")
+                    title=link_result.title,
+                    summary=link_result.title,
+                    content=link_result.content,
+                    links=link_result.links,
+                    domain=request.url.split('/')[2] if '/' in request.url else request.url
+                )
+                pages_indexed += 1
+                job.progress = 50 + (i + 1) * 8
+                await send_job_update(request.job_id, f"Cached: {link_result.title[:60]}...")
+            except Exception as link_error:
+                logger.warning(f"Failed to index {link_url}: {link_error}")
+        
+        await send_job_update(request.job_id, f"Indexing complete! Indexed {pages_indexed} pages, found {links_found} links.")
+        job.progress = 100
+        job.status = "completed"
+        job.result = {
+            "pages_indexed": pages_indexed,
+            "links_found": links_found,
+            "url": request.url
+        }
+        
+    except Exception as e:
+        logger.error(f"Indexing job {request.job_id} failed: {e}")
+        job.status = "failed"
+        job.error = str(e)
+        await send_job_update(request.job_id, f"Error: {str(e)}")
+
+async def run_search_job(request: SearchRequest):
+    """Background task for search - uses doc2mcp agent"""
+    job = jobs[request.job_id]
+    
+    try:
+        await send_job_update(request.job_id, f"Searching for: {request.query}")
+        job.progress = 10
+        
+        # Create a temporary tool config for this search
+        tool_config = ToolConfig(
+            name=request.tool_name,
+            description=request.tool_description,
+            sources=[]  # Agent will use cached pages
+        )
+        
+        # Update agent config
+        if agent:
+            agent.config.tools[request.tool_id] = tool_config
+            
+            await send_job_update(request.job_id, "Initializing search agent...")
+            job.progress = 20
+            
+            # Perform the search
+            await send_job_update(request.job_id, "Exploring documentation...")
+            result = await agent.search(request.tool_id, request.query)
+            job.progress = 80
+            
+            if result.get("error"):
+                raise Exception(result["error"])
+            
+            await send_job_update(request.job_id, "Synthesizing answer...")
+            job.progress = 95
+            
+            await send_job_update(request.job_id, "Search complete!")
+            job.progress = 100
+            job.status = "completed"
+            job.result = {
+                "content": result.get("content", "No content found"),
+                "sources": result.get("sources", []),
+                "pages_explored": result.get("pages_explored", 0),
+                "tool": result.get("tool", {})
+            }
+        else:
+            raise Exception("Agent not initialized")
+        
+    except Exception as e:
+        logger.error(f"Search job {request.job_id} failed: {e}")
+        job.status = "failed"
+        job.error = str(e)
+        await send_job_update(request.job_id, f"Error: {str(e)}")
+
 async def send_job_update(job_id: str, log_message: str):
     """Send job update to WebSocket if connected"""
     if job_id in jobs:
@@ -284,20 +297,6 @@ async def websocket_endpoint(websocket: WebSocket, job_id: str):
     except WebSocketDisconnect:
         if job_id in websocket_connections:
             del websocket_connections[job_id]
-
-        job.progress = 100
-        job.status = "completed"
-        job.result = {
-            "answer": "This is a placeholder answer that would come from Gemini.",
-            "sources": ["https://example.com/page1", "https://example.com/page2"],
-            "pages_explored": 5
-        }
-        
-    except Exception as e:
-        logger.error(f"Search job {request.job_id} failed: {e}")
-        job.status = "failed"
-        job.error = str(e)
-        job.logs.append(f"Error: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
