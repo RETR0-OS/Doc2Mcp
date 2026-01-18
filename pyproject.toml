@@ -34,6 +34,7 @@ dependencies = [
     "opentelemetry-api>=1.20.0",
     "opentelemetry-sdk>=1.20.0",
     "google-genai>=0.2.0",
+    "openai>=1.0.0",
     "python-dotenv>=1.0.0",
     "tokenc>=0.1.2",
 ]

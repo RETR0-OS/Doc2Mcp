@@ -5,8 +5,6 @@ import os
 from typing import Any
 from urllib.parse import urlparse
 
-from google import genai
-from google.genai import types
 from opentelemetry import trace
 
 from doc2mcp.cache import PageCache
@@ -14,6 +12,7 @@ from doc2mcp.compression import ContentCompressor
 from doc2mcp.config import Config, LocalSource, ToolConfig, WebSource
 from doc2mcp.fetchers.local import LocalFetcher
 from doc2mcp.fetchers.web import FetchResult, WebFetcher
+from doc2mcp.llm import create_llm_provider, LLMProvider
 from doc2mcp.tracing.phoenix import trace_doc_retrieval, trace_llm_call
 
 # Default max pages to explore per query
@@ -26,7 +25,7 @@ class DocSearchAgent:
     This agent:
     1. Starts from configured source URLs
     2. Fetches pages and caches them with descriptive summaries
-    3. Uses Gemini to decide which links to follow based on the query
+    3. Uses an LLM to decide which links to follow based on the query
     4. Continues until it finds sufficient information or hits limits
     5. Returns the most relevant documentation
     """
@@ -36,6 +35,7 @@ class DocSearchAgent:
         config: Config,
         cache_path: str = "./doc_cache.json",
         max_pages: int = DEFAULT_MAX_PAGES,
+        llm_provider: LLMProvider | None = None,
     ) -> None:
         self.config = config
         self.max_pages = max_pages
@@ -51,19 +51,11 @@ class DocSearchAgent:
             enabled=compression_settings.enabled,
         )
 
-        # Initialize Gemini client
-        api_key = os.environ.get("GOOGLE_API_KEY")
-        if not api_key:
-            raise ValueError("GOOGLE_API_KEY environment variable is required")
+        # Initialize LLM provider (supports Gemini, OpenAI, Local)
+        self.llm = llm_provider or create_llm_provider()
 
-        self.client = genai.Client(api_key=api_key)
-
-        # Model configuration for navigation decisions (fast, cheap)
-        self.nav_model_name = "gemini-2.0-flash-exp"
+        # System prompts
         self.nav_system_instruction = self._get_navigation_prompt()
-
-        # Model configuration for final answer synthesis
-        self.synthesis_model_name = "gemini-2.0-flash-exp"
         self.synthesis_system_instruction = self._get_synthesis_prompt()
 
         self.tracer = trace.get_tracer("doc2mcp.agent")
@@ -367,34 +359,23 @@ Analyze this page and respond with a JSON object."""
                 span.set_attribute("compression_ratio", compressed_content.compression_ratio)
 
             try:
-                response = await self.client.aio.models.generate_content(
-                    model=self.nav_model_name,
-                    contents=prompt,
-                    config=types.GenerateContentConfig(
-                        system_instruction=self.nav_system_instruction,
-                        max_output_tokens=4096,
-                        temperature=0.1,
-                        response_mime_type="application/json",
-                    ),
+                response = await self.llm.generate(
+                    prompt=prompt,
+                    system_instruction=self.nav_system_instruction,
+                    max_tokens=4096,
+                    temperature=0.1,
+                    json_response=True,
                 )
 
                 result_text = response.text
 
                 # Trace the call
                 trace_llm_call(
-                    model=self.nav_model_name,
+                    model=response.model or self.llm.name,
                     messages=[{"role": "user", "content": prompt[:500]}],
                     response=result_text[:500],
-                    tokens_in=getattr(
-                        getattr(response, "usage_metadata", None),
-                        "prompt_token_count",
-                        None,
-                    ),
-                    tokens_out=getattr(
-                        getattr(response, "usage_metadata", None),
-                        "candidates_token_count",
-                        None,
-                    ),
+                    tokens_in=response.tokens_in,
+                    tokens_out=response.tokens_out,
                 )
 
                 return json.loads(result_text)
@@ -452,32 +433,22 @@ Please synthesize a comprehensive answer to the query using the documentation ab
                 span.set_attribute("tokens_saved", compressed_content.tokens_saved)
                 span.set_attribute("compression_ratio", compressed_content.compression_ratio)
 
-            response = await self.client.aio.models.generate_content(
-                model=self.synthesis_model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    system_instruction=self.synthesis_system_instruction,
-                    max_output_tokens=8192,
-                    temperature=0.1,
-                ),
+            response = await self.llm.generate(
+                prompt=prompt,
+                system_instruction=self.synthesis_system_instruction,
+                max_tokens=8192,
+                temperature=0.1,
+                json_response=False,
             )
 
             result = response.text
 
             trace_llm_call(
-                model=self.synthesis_model_name,
+                model=response.model or self.llm.name,
                 messages=[{"role": "user", "content": prompt[:500]}],
                 response=result[:500],
-                tokens_in=getattr(
-                    getattr(response, "usage_metadata", None),
-                    "prompt_token_count",
-                    None,
-                ),
-                tokens_out=getattr(
-                    getattr(response, "usage_metadata", None),
-                    "candidates_token_count",
-                    None,
-                ),
+                tokens_in=response.tokens_in,
+                tokens_out=response.tokens_out,
             )
 
             return result
