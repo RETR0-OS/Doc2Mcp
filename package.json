@@ -1,0 +1,57 @@
+{
+  "name": "doc2mcp",
+  "version": "1.0.0",
+  "description": "An MCP server that converts API documentation URLs into callable tools with Arize observability",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "doc2mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "keywords": [
+    "mcp",
+    "api",
+    "documentation",
+    "openapi",
+    "swagger",
+    "observability",
+    "arize",
+    "opentelemetry"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/sdk-trace-base": "^1.25.0",
+    "@opentelemetry/sdk-trace-node": "^1.25.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.52.0",
+    "@opentelemetry/resources": "^1.25.0",
+    "@opentelemetry/semantic-conventions": "^1.25.0",
+    "zod": "^3.23.8",
+    "axios": "^1.7.2",
+    "cheerio": "^1.0.0-rc.12",
+    "marked": "^12.0.2",
+    "yaml": "^2.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "typescript": "^5.4.5",
+    "tsx": "^4.11.0",
+    "vitest": "^1.6.0",
+    "@typescript-eslint/eslint-plugin": "^7.10.0",
+    "@typescript-eslint/parser": "^7.10.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
