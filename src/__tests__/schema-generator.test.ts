@@ -4,7 +4,6 @@
 
 import { describe, it, expect } from 'vitest';
 import { SchemaGenerator } from '../generators/schema-generator.js';
-import { z } from 'zod';
 
 describe('SchemaGenerator', () => {
   const generator = new SchemaGenerator();

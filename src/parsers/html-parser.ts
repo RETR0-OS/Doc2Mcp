@@ -21,7 +21,7 @@ export class HTMLParser {
     // Look for common patterns like <code>/api/...</code> or method badges
     const codeBlocks = $('code, pre code, .endpoint, .api-endpoint');
     const methodPattern = /\b(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD)\b/gi;
-    const pathPattern = /\/[a-zA-Z0-9\/_\-{}\:]+/g;
+    const pathPattern = /\/[a-zA-Z0-9/_\-{}:]+/g;
 
     const foundEndpoints = new Set<string>();
 

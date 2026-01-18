@@ -70,7 +70,7 @@ export class SchemaGenerator {
     const description = schema.description || '';
 
     switch (schema.type) {
-      case 'string':
+      case 'string': {
         if (schema.enum && Array.isArray(schema.enum) && schema.enum.length > 0) {
           return z.enum(schema.enum as [string, ...string[]]).describe(description);
         }
@@ -85,9 +85,10 @@ export class SchemaGenerator {
           stringSchema = stringSchema.regex(new RegExp(schema.pattern));
         }
         return stringSchema.describe(description);
+      }
 
       case 'number':
-      case 'integer':
+      case 'integer': {
         let numberSchema = z.number();
         if (schema.minimum !== undefined) {
           numberSchema = numberSchema.min(schema.minimum);
@@ -99,11 +100,12 @@ export class SchemaGenerator {
           numberSchema = numberSchema.int();
         }
         return numberSchema.describe(description);
+      }
 
       case 'boolean':
         return z.boolean().describe(description);
 
-      case 'array':
+      case 'array': {
         const itemSchema = schema.items ? this.schemaToZod(schema.items) : z.any();
         let arraySchema = z.array(itemSchema);
         if (schema.minItems) {
@@ -113,6 +115,7 @@ export class SchemaGenerator {
           arraySchema = arraySchema.max(schema.maxItems);
         }
         return arraySchema.describe(description);
+      }
 
       case 'object':
         if (schema.properties) {
