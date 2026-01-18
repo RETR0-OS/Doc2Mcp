@@ -1,0 +1,12 @@
+Title: Just a moment...
+
+URL Source: https://platform.openai.com/docs/overview
+
+Warning: Target URL returned error 403: Forbidden
+Warning: This page maybe not yet fully loaded, consider explicitly specify a timeout.
+
+Markdown Content:
+Just a moment...
+===============
+
+Waiting for platform.openai.com to respond...

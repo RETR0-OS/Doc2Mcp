@@ -1,5 +1,6 @@
 """Doc2MCP - MCP server for tool documentation search."""
 
+import asyncio
 import logging
 import os
 from pathlib import Path
@@ -96,13 +97,14 @@ async def list_tools() -> list[Tool]:
 @server.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Handle tool calls from MCP clients."""
+    logger.info(f"call_tool: name={name}, _agent={_agent is not None}, _registry={_registry is not None}")
     agent = get_agent()
 
     if name == "search_docs":
         logger.info(f"Searching docs for '{arguments.get('tool_name')}': {arguments.get('query')}")
         return await handle_search_docs(agent, arguments)
     elif name == "list_available_tools":
-        return await handle_list_tools(agent)
+        return await handle_list_tools(agent, _registry)
     elif _registry and _registry.get_tool(name):
         # Handle auto-generated tool call
         logger.info(f"Fetching documentation: {name}")

@@ -1,0 +1,1255 @@
+{
+  "tools": [
+    {
+      "tool_id": "anthropic_login",
+      "name": "Claude Developer Platform",
+      "description": "Documentation: Claude Developer Platform. Topics: login",
+      "url": "https://platform.claude.com/login",
+      "keywords": [
+        "login"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_dashboard",
+      "name": "Claude Developer Platform",
+      "description": "Documentation: Claude Developer Platform. Topics: dashboard",
+      "url": "https://platform.claude.com/dashboard",
+      "keywords": [
+        "dashboard"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_docs",
+      "name": "Not Found",
+      "description": "Documentation: Not Found",
+      "url": "https://platform.claude.com/docs/en/docs",
+      "keywords": [],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_home",
+      "name": "Documentation",
+      "description": "Documentation: Documentation. Topics: home",
+      "url": "https://platform.claude.com/docs/en/home",
+      "keywords": [
+        "home"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_workbench_new",
+      "name": "Claude Developer Platform",
+      "description": "Documentation: Claude Developer Platform. Topics: workbench, new",
+      "url": "https://platform.claude.com/workbench/new",
+      "keywords": [
+        "workbench",
+        "new"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_llms_full_txt",
+      "name": "Reset Active Directory password\\",
+      "description": "Documentation: Reset Active Directory password\\. Topics: llms, full, txt",
+      "url": "https://platform.claude.com/llms-full.txt",
+      "keywords": [
+        "llms",
+        "full",
+        "txt"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_settings_keys",
+      "name": "Claude Developer Platform",
+      "description": "Documentation: Claude Developer Platform. Topics: settings, keys",
+      "url": "https://platform.claude.com/settings/keys",
+      "keywords": [
+        "settings",
+        "keys"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_settings_profile",
+      "name": "Claude Developer Platform",
+      "description": "Documentation: Claude Developer Platform. Topics: settings, profile",
+      "url": "https://platform.claude.com/settings/profile",
+      "keywords": [
+        "settings",
+        "profile"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_api_beta",
+      "name": "Beta",
+      "description": "Documentation: Beta. Topics: beta",
+      "url": "https://platform.claude.com/docs/en/api/beta",
+      "keywords": [
+        "beta"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_settings_members",
+      "name": "Claude Developer Platform",
+      "description": "Documentation: Claude Developer Platform. Topics: settings, members",
+      "url": "https://platform.claude.com/settings/members",
+      "keywords": [
+        "settings",
+        "members"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_settings_privacy",
+      "name": "Claude Developer Platform",
+      "description": "Documentation: Claude Developer Platform. Topics: settings, privacy",
+      "url": "https://platform.claude.com/settings/privacy",
+      "keywords": [
+        "settings",
+        "privacy"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_api_errors",
+      "name": "Errors",
+      "description": "Documentation: Errors. Topics: errors",
+      "url": "https://platform.claude.com/docs/en/api/errors",
+      "keywords": [
+        "errors"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_settings_workspaces",
+      "name": "Claude Developer Platform",
+      "description": "Documentation: Claude Developer Platform. Topics: settings, workspaces",
+      "url": "https://platform.claude.com/settings/workspaces",
+      "keywords": [
+        "settings",
+        "workspaces"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_settings_organization",
+      "name": "Claude Developer Platform",
+      "description": "Documentation: Claude Developer Platform. Topics: settings, organization",
+      "url": "https://platform.claude.com/settings/organization",
+      "keywords": [
+        "settings",
+        "organization"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_api_versioning",
+      "name": "Versions",
+      "description": "Documentation: Versions. Topics: versioning",
+      "url": "https://platform.claude.com/docs/en/api/versioning",
+      "keywords": [
+        "versioning"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_api_client_sdks",
+      "name": "Client SDKs",
+      "description": "Documentation: Client SDKs. Topics: client, sdks",
+      "url": "https://platform.claude.com/docs/en/api/client-sdks",
+      "keywords": [
+        "client",
+        "sdks"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_api_beta_headers",
+      "name": "Beta headers",
+      "description": "Documentation: Beta headers. Topics: beta, headers",
+      "url": "https://platform.claude.com/docs/en/api/beta-headers",
+      "keywords": [
+        "beta",
+        "headers"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_api_ip_addresses",
+      "name": "IP addresses",
+      "description": "Documentation: IP addresses. Topics: ip, addresses",
+      "url": "https://platform.claude.com/docs/en/api/ip-addresses",
+      "keywords": [
+        "ip",
+        "addresses"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_skills",
+      "name": "Agent Skills in the SDK",
+      "description": "Documentation: Agent Skills in the SDK. Topics: agent, sdk, skills",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/skills",
+      "keywords": [
+        "agent",
+        "sdk",
+        "skills"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_hosting",
+      "name": "Hosting the Agent SDK",
+      "description": "Documentation: Hosting the Agent SDK. Topics: agent, sdk, hosting",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/hosting",
+      "keywords": [
+        "agent",
+        "sdk",
+        "hosting"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_plugins",
+      "name": "Plugins in the SDK",
+      "description": "Documentation: Plugins in the SDK. Topics: agent, sdk, plugins",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/plugins",
+      "keywords": [
+        "agent",
+        "sdk",
+        "plugins"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_resources_overview",
+      "name": "Documentation",
+      "description": "Documentation: Documentation. Topics: resources, overview",
+      "url": "https://platform.claude.com/docs/en/resources/overview",
+      "keywords": [
+        "resources",
+        "overview"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_overview",
+      "name": "Agent SDK overview",
+      "description": "Documentation: Agent SDK overview. Topics: agent, sdk, overview",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/overview",
+      "keywords": [
+        "agent",
+        "sdk",
+        "overview"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_workspaces_default_batches",
+      "name": "Claude Developer Platform",
+      "description": "Documentation: Claude Developer Platform. Topics: workspaces, default, batches",
+      "url": "https://platform.claude.com/workspaces/default/batches",
+      "keywords": [
+        "workspaces",
+        "default",
+        "batches"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_quickstart",
+      "name": "Quickstart",
+      "description": "Documentation: Quickstart. Topics: agent, sdk, quickstart",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/quickstart",
+      "keywords": [
+        "agent",
+        "sdk",
+        "quickstart"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_claude_api_primer_md",
+      "name": "Claude Api Primer",
+      "description": "Documentation: Claude Api Primer. Topics: claude, api, primer, md",
+      "url": "https://platform.claude.com/docs/en/claude_api_primer.md",
+      "keywords": [
+        "claude",
+        "api",
+        "primer",
+        "md"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_beta_skills_list",
+      "name": "List Skills",
+      "description": "Documentation: List Skills. Topics: beta, skills, list",
+      "url": "https://platform.claude.com/docs/en/api/beta/skills/list",
+      "keywords": [
+        "beta",
+        "skills",
+        "list"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_cookbook_misc_building_evals",
+      "name": "Building evals",
+      "description": "Documentation: Building evals. Topics: cookbook, misc, building, evals",
+      "url": "https://platform.claude.com/cookbook/misc-building-evals",
+      "keywords": [
+        "cookbook",
+        "misc",
+        "building",
+        "evals"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_cookbook_misc_prompt_caching",
+      "name": "Prompt caching through the Claude API",
+      "description": "Documentation: Prompt caching through the Claude API. Topics: cookbook, misc, prompt, caching",
+      "url": "https://platform.claude.com/cookbook/misc-prompt-caching",
+      "keywords": [
+        "cookbook",
+        "misc",
+        "prompt",
+        "caching"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_about_claude_glossary",
+      "name": "Glossary",
+      "description": "Documentation: Glossary. Topics: about, claude, glossary",
+      "url": "https://platform.claude.com/docs/en/about-claude/glossary",
+      "keywords": [
+        "about",
+        "claude",
+        "glossary"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_api_supported_regions",
+      "name": "Supported regions",
+      "description": "Documentation: Supported regions. Topics: supported, regions",
+      "url": "https://platform.claude.com/docs/en/api/supported-regions",
+      "keywords": [
+        "supported",
+        "regions"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_beta_skills_create",
+      "name": "Create Skill",
+      "description": "Documentation: Create Skill. Topics: beta, skills, create",
+      "url": "https://platform.claude.com/docs/en/api/beta/skills/create",
+      "keywords": [
+        "beta",
+        "skills",
+        "create"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_beta_skills_delete",
+      "name": "Delete Skill",
+      "description": "Documentation: Delete Skill. Topics: beta, skills, delete",
+      "url": "https://platform.claude.com/docs/en/api/beta/skills/delete",
+      "keywords": [
+        "beta",
+        "skills",
+        "delete"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_cost_tracking",
+      "name": "Tracking Costs and Usage",
+      "description": "Documentation: Tracking Costs and Usage. Topics: agent, sdk, cost, tracking",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/cost-tracking",
+      "keywords": [
+        "agent",
+        "sdk",
+        "cost",
+        "tracking"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_build_with_claude_files",
+      "name": "Files API",
+      "description": "Documentation: Files API. Topics: build, with, claude, files",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/files",
+      "keywords": [
+        "build",
+        "with",
+        "claude",
+        "files"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_beta_files_download",
+      "name": "Download File",
+      "description": "Documentation: Download File. Topics: beta, files, download",
+      "url": "https://platform.claude.com/docs/en/api/beta/files/download",
+      "keywords": [
+        "beta",
+        "files",
+        "download"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_build_with_claude_vision",
+      "name": "Vision",
+      "description": "Documentation: Vision. Topics: build, with, claude, vision",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/vision",
+      "keywords": [
+        "build",
+        "with",
+        "claude",
+        "vision"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_beta_models_retrieve",
+      "name": "Get a Model",
+      "description": "Documentation: Get a Model. Topics: beta, models, retrieve",
+      "url": "https://platform.claude.com/docs/en/api/beta/models/retrieve",
+      "keywords": [
+        "beta",
+        "models",
+        "retrieve"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_migration_guide",
+      "name": "Migrate to Claude Agent SDK",
+      "description": "Documentation: Migrate to Claude Agent SDK. Topics: agent, sdk, migration, guide",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/migration-guide",
+      "keywords": [
+        "agent",
+        "sdk",
+        "migration",
+        "guide"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_messages_batches_list",
+      "name": "List Message Batches",
+      "description": "Documentation: List Message Batches. Topics: messages, batches, list",
+      "url": "https://platform.claude.com/docs/en/api/messages/batches/list",
+      "keywords": [
+        "messages",
+        "batches",
+        "list"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_api_messages_count_tokens",
+      "name": "Count tokens in a Message",
+      "description": "Documentation: Count tokens in a Message. Topics: messages, count, tokens",
+      "url": "https://platform.claude.com/docs/en/api/messages/count_tokens",
+      "keywords": [
+        "messages",
+        "count",
+        "tokens"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_messages_batches_cancel",
+      "name": "Cancel a Message Batch",
+      "description": "Documentation: Cancel a Message Batch. Topics: messages, batches, cancel",
+      "url": "https://platform.claude.com/docs/en/api/messages/batches/cancel",
+      "keywords": [
+        "messages",
+        "batches",
+        "cancel"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_messages_batches_create",
+      "name": "Create a Message Batch",
+      "description": "Documentation: Create a Message Batch. Topics: messages, batches, create",
+      "url": "https://platform.claude.com/docs/en/api/messages/batches/create",
+      "keywords": [
+        "messages",
+        "batches",
+        "create"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_test_and_evaluate_eval_tool",
+      "name": "Using the Evaluation Tool",
+      "description": "Documentation: Using the Evaluation Tool. Topics: test, and, evaluate, eval, tool",
+      "url": "https://platform.claude.com/docs/en/test-and-evaluate/eval-tool",
+      "keywords": [
+        "test",
+        "and",
+        "evaluate",
+        "eval",
+        "tool"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_secure_deployment",
+      "name": "Securely deploying AI agents",
+      "description": "Documentation: Securely deploying AI agents. Topics: agent, sdk, secure, deployment",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/secure-deployment",
+      "keywords": [
+        "agent",
+        "sdk",
+        "secure",
+        "deployment"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_build_with_claude_citations",
+      "name": "Citations",
+      "description": "Documentation: Citations. Topics: build, with, claude, citations",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/citations",
+      "keywords": [
+        "build",
+        "with",
+        "claude",
+        "citations"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_build_with_claude_embeddings",
+      "name": "Embeddings",
+      "description": "Documentation: Embeddings. Topics: build, with, claude, embeddings",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/embeddings",
+      "keywords": [
+        "build",
+        "with",
+        "claude",
+        "embeddings"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_about_claude_models_overview",
+      "name": "Models overview",
+      "description": "Documentation: Models overview. Topics: about, claude, models, overview",
+      "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "keywords": [
+        "about",
+        "claude",
+        "models",
+        "overview"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_file_checkpointing",
+      "name": "Rewind file changes with checkpointing",
+      "description": "Documentation: Rewind file changes with checkpointing. Topics: agent, sdk, file, checkpointing",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/file-checkpointing",
+      "keywords": [
+        "agent",
+        "sdk",
+        "file",
+        "checkpointing"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_messages_batches_results",
+      "name": "Retrieve Message Batch results",
+      "description": "Documentation: Retrieve Message Batch results. Topics: messages, batches, results",
+      "url": "https://platform.claude.com/docs/en/api/messages/batches/results",
+      "keywords": [
+        "messages",
+        "batches",
+        "results"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "openai_mcp",
+      "name": "Mcp",
+      "description": "Documentation: Mcp. Topics: mcp",
+      "url": "https://platform.openai.com/docs/mcp",
+      "keywords": [
+        "mcp"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_models",
+      "name": "Models",
+      "description": "Documentation: Models. Topics: models",
+      "url": "https://platform.openai.com/docs/models",
+      "keywords": [
+        "models"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_pricing",
+      "name": "Pricing",
+      "description": "Documentation: Pricing. Topics: pricing",
+      "url": "https://platform.openai.com/docs/pricing",
+      "keywords": [
+        "pricing"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_overview",
+      "name": "Overview",
+      "description": "Documentation: Overview. Topics: overview",
+      "url": "https://platform.openai.com/docs/overview",
+      "keywords": [
+        "overview"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_docs_mcp",
+      "name": "Docs Mcp",
+      "description": "Documentation: Docs Mcp. Topics: docs, mcp",
+      "url": "https://platform.openai.com/docs/docs-mcp",
+      "keywords": [
+        "docs",
+        "mcp"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_libraries",
+      "name": "Libraries",
+      "description": "Documentation: Libraries. Topics: libraries",
+      "url": "https://platform.openai.com/docs/libraries",
+      "keywords": [
+        "libraries"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_changelog",
+      "name": "Changelog",
+      "description": "Documentation: Changelog. Topics: changelog",
+      "url": "https://platform.openai.com/docs/changelog",
+      "keywords": [
+        "changelog"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_quickstart",
+      "name": "Quickstart",
+      "description": "Documentation: Quickstart. Topics: quickstart",
+      "url": "https://platform.openai.com/docs/quickstart",
+      "keywords": [
+        "quickstart"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_text",
+      "name": "Text",
+      "description": "Documentation: Text. Topics: guides, text",
+      "url": "https://platform.openai.com/docs/guides/text",
+      "keywords": [
+        "guides",
+        "text"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_rbac",
+      "name": "Rbac",
+      "description": "Documentation: Rbac. Topics: guides, rbac",
+      "url": "https://platform.openai.com/docs/guides/rbac",
+      "keywords": [
+        "guides",
+        "rbac"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_audio",
+      "name": "Audio",
+      "description": "Documentation: Audio. Topics: guides, audio",
+      "url": "https://platform.openai.com/docs/guides/audio",
+      "keywords": [
+        "guides",
+        "audio"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_tools",
+      "name": "Tools",
+      "description": "Documentation: Tools. Topics: guides, tools",
+      "url": "https://platform.openai.com/docs/guides/tools",
+      "keywords": [
+        "guides",
+        "tools"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_evals",
+      "name": "Evals",
+      "description": "Documentation: Evals. Topics: guides, evals",
+      "url": "https://platform.openai.com/docs/guides/evals",
+      "keywords": [
+        "guides",
+        "evals"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_batch",
+      "name": "Batch",
+      "description": "Documentation: Batch. Topics: guides, batch",
+      "url": "https://platform.openai.com/docs/guides/batch",
+      "keywords": [
+        "guides",
+        "batch"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_deprecations",
+      "name": "Deprecations",
+      "description": "Documentation: Deprecations. Topics: deprecations",
+      "url": "https://platform.openai.com/docs/deprecations",
+      "keywords": [
+        "deprecations"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_agents",
+      "name": "Agents",
+      "description": "Documentation: Agents. Topics: guides, agents",
+      "url": "https://platform.openai.com/docs/guides/agents",
+      "keywords": [
+        "guides",
+        "agents"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_chatkit",
+      "name": "Chatkit",
+      "description": "Documentation: Chatkit. Topics: guides, chatkit",
+      "url": "https://platform.openai.com/docs/guides/chatkit",
+      "keywords": [
+        "guides",
+        "chatkit"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_graders",
+      "name": "Graders",
+      "description": "Documentation: Graders. Topics: guides, graders",
+      "url": "https://platform.openai.com/docs/guides/graders",
+      "keywords": [
+        "guides",
+        "graders"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_webhooks",
+      "name": "Webhooks",
+      "description": "Documentation: Webhooks. Topics: guides, webhooks",
+      "url": "https://platform.openai.com/docs/guides/webhooks",
+      "keywords": [
+        "guides",
+        "webhooks"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_realtime",
+      "name": "Realtime",
+      "description": "Documentation: Realtime. Topics: guides, realtime",
+      "url": "https://platform.openai.com/docs/guides/realtime",
+      "keywords": [
+        "guides",
+        "realtime"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_retrieval",
+      "name": "Retrieval",
+      "description": "Documentation: Retrieval. Topics: guides, retrieval",
+      "url": "https://platform.openai.com/docs/guides/retrieval",
+      "keywords": [
+        "guides",
+        "retrieval"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_pdf_files",
+      "name": "Pdf Files",
+      "description": "Documentation: Pdf Files. Topics: guides, pdf, files",
+      "url": "https://platform.openai.com/docs/guides/pdf-files",
+      "keywords": [
+        "guides",
+        "pdf",
+        "files"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_prompting",
+      "name": "Prompting",
+      "description": "Documentation: Prompting. Topics: guides, prompting",
+      "url": "https://platform.openai.com/docs/guides/prompting",
+      "keywords": [
+        "guides",
+        "prompting"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_reasoning",
+      "name": "Reasoning",
+      "description": "Documentation: Reasoning. Topics: guides, reasoning",
+      "url": "https://platform.openai.com/docs/guides/reasoning",
+      "keywords": [
+        "guides",
+        "reasoning"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_assistants_tools",
+      "name": "Tools",
+      "description": "Documentation: Tools. Topics: assistants, tools",
+      "url": "https://platform.openai.com/docs/assistants/tools",
+      "keywords": [
+        "assistants",
+        "tools"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_your_data",
+      "name": "Your Data",
+      "description": "Documentation: Your Data. Topics: guides, your, data",
+      "url": "https://platform.openai.com/docs/guides/your-data",
+      "keywords": [
+        "guides",
+        "your",
+        "data"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_agents_sdk",
+      "name": "Agents Sdk",
+      "description": "Documentation: Agents Sdk. Topics: guides, agents, sdk",
+      "url": "https://platform.openai.com/docs/guides/agents-sdk",
+      "keywords": [
+        "guides",
+        "agents",
+        "sdk"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_background",
+      "name": "Background",
+      "description": "Documentation: Background. Topics: guides, background",
+      "url": "https://platform.openai.com/docs/guides/background",
+      "keywords": [
+        "guides",
+        "background"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_embeddings",
+      "name": "Embeddings",
+      "description": "Documentation: Embeddings. Topics: guides, embeddings",
+      "url": "https://platform.openai.com/docs/guides/embeddings",
+      "keywords": [
+        "guides",
+        "embeddings"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_moderation",
+      "name": "Moderation",
+      "description": "Documentation: Moderation. Topics: guides, moderation",
+      "url": "https://platform.openai.com/docs/guides/moderation",
+      "keywords": [
+        "guides",
+        "moderation"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_agent_evals",
+      "name": "Agent Evals",
+      "description": "Documentation: Agent Evals. Topics: guides, agent, evals",
+      "url": "https://platform.openai.com/docs/guides/agent-evals",
+      "keywords": [
+        "guides",
+        "agent",
+        "evals"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_tools_shell",
+      "name": "Tools Shell",
+      "description": "Documentation: Tools Shell. Topics: guides, tools, shell",
+      "url": "https://platform.openai.com/docs/guides/tools-shell",
+      "keywords": [
+        "guides",
+        "tools",
+        "shell"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_rate_limits",
+      "name": "Rate Limits",
+      "description": "Documentation: Rate Limits. Topics: guides, rate, limits",
+      "url": "https://platform.openai.com/docs/guides/rate-limits",
+      "keywords": [
+        "guides",
+        "rate",
+        "limits"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_actions_production",
+      "name": "Production",
+      "description": "Documentation: Production. Topics: actions, production",
+      "url": "https://platform.openai.com/docs/actions/production",
+      "keywords": [
+        "actions",
+        "production"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_api_reference_chat",
+      "name": "Chat",
+      "description": "Documentation: Chat. Topics: api, reference, chat",
+      "url": "https://platform.openai.com/docs/api-reference/chat",
+      "keywords": [
+        "api",
+        "reference",
+        "chat"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_api_reference_runs",
+      "name": "Runs",
+      "description": "Documentation: Runs. Topics: api, reference, runs",
+      "url": "https://platform.openai.com/docs/api-reference/runs",
+      "keywords": [
+        "api",
+        "reference",
+        "runs"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_latest_model",
+      "name": "Latest Model",
+      "description": "Documentation: Latest Model. Topics: guides, latest, model",
+      "url": "https://platform.openai.com/docs/guides/latest-model",
+      "keywords": [
+        "guides",
+        "latest",
+        "model"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_voice_agents",
+      "name": "Voice Agents",
+      "description": "Documentation: Voice Agents. Topics: guides, voice, agents",
+      "url": "https://platform.openai.com/docs/guides/voice-agents",
+      "keywords": [
+        "guides",
+        "voice",
+        "agents"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_realtime_sip",
+      "name": "Realtime Sip",
+      "description": "Documentation: Realtime Sip. Topics: guides, realtime, sip",
+      "url": "https://platform.openai.com/docs/guides/realtime-sip",
+      "keywords": [
+        "guides",
+        "realtime",
+        "sip"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_api_reference_audio",
+      "name": "Audio",
+      "description": "Documentation: Audio. Topics: api, reference, audio",
+      "url": "https://platform.openai.com/docs/api-reference/audio",
+      "keywords": [
+        "api",
+        "reference",
+        "audio"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_api_reference_evals",
+      "name": "Evals",
+      "description": "Documentation: Evals. Topics: api, reference, evals",
+      "url": "https://platform.openai.com/docs/api-reference/evals",
+      "keywords": [
+        "api",
+        "reference",
+        "evals"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_api_reference_batch",
+      "name": "Batch",
+      "description": "Documentation: Batch. Topics: api, reference, batch",
+      "url": "https://platform.openai.com/docs/api-reference/batch",
+      "keywords": [
+        "api",
+        "reference",
+        "batch"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_api_reference_files",
+      "name": "Files",
+      "description": "Documentation: Files. Topics: api, reference, files",
+      "url": "https://platform.openai.com/docs/api-reference/files",
+      "keywords": [
+        "api",
+        "reference",
+        "files"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_api_reference_users",
+      "name": "Users",
+      "description": "Documentation: Users. Topics: api, reference, users",
+      "url": "https://platform.openai.com/docs/api-reference/users",
+      "keywords": [
+        "api",
+        "reference",
+        "users"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_api_reference_roles",
+      "name": "Roles",
+      "description": "Documentation: Roles. Topics: api, reference, roles",
+      "url": "https://platform.openai.com/docs/api-reference/roles",
+      "keywords": [
+        "api",
+        "reference",
+        "roles"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_api_reference_usage",
+      "name": "Usage",
+      "description": "Documentation: Usage. Topics: api, reference, usage",
+      "url": "https://platform.openai.com/docs/api-reference/usage",
+      "keywords": [
+        "api",
+        "reference",
+        "usage"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_images_vision",
+      "name": "Images Vision",
+      "description": "Documentation: Images Vision. Topics: guides, images, vision",
+      "url": "https://platform.openai.com/docs/guides/images-vision",
+      "keywords": [
+        "guides",
+        "images",
+        "vision"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_agent_builder",
+      "name": "Agent Builder",
+      "description": "Documentation: Agent Builder. Topics: guides, agent, builder",
+      "url": "https://platform.openai.com/docs/guides/agent-builder",
+      "keywords": [
+        "guides",
+        "agent",
+        "builder"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_trace_grading",
+      "name": "Trace Grading",
+      "description": "Documentation: Trace Grading. Topics: guides, trace, grading",
+      "url": "https://platform.openai.com/docs/guides/trace-grading",
+      "keywords": [
+        "guides",
+        "trace",
+        "grading"
+      ],
+      "parent_source": "openai",
+      "content": null
+    },
+    {
+      "tool_id": "openai_guides_rft_use_cases",
+      "name": "Rft Use Cases",
+      "description": "Documentation: Rft Use Cases. Topics: guides, rft, use, cases",
+      "url": "https://platform.openai.com/docs/guides/rft-use-cases",
+      "keywords": [
+        "guides",
+        "rft",
+        "use",
+        "cases"
+      ],
+      "parent_source": "openai",
+      "content": null
+    }
+  ]
+}

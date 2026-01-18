@@ -186,7 +186,7 @@ class ToolRegistry:
         logger.info(f"Fetching content for {tool_id}: {tool.url}")
         try:
             result = await self._fetcher.fetch_with_links(tool.url)
-            content = result.get("content", "")
+            content = result.content
             
             if content:
                 # Cache the content
