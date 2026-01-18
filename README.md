@@ -272,44 +272,101 @@ npm run format
 npm test
 ```
 
-## Deployment Options
+## Deployment
 
-### Docker
+### Prerequisites
 
-```dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --production
-COPY dist ./dist
-CMD ["node", "dist/index.js"]
-```
+Before deploying, ensure you have:
+- Node.js 18.0.0 or higher
+- Built the project: `npm run build`
+- Configured environment variables (see `.env.example`)
 
-### systemd Service
+For comprehensive deployment guides including Docker Compose, Kubernetes, monitoring, and security best practices, see [DEPLOYMENT.md](./DEPLOYMENT.md).
 
-```ini
-[Unit]
-Description=Doc2MCP Server
-After=network.target
+### Quick Deployment Options
 
-[Service]
-Type=simple
-User=doc2mcp
-WorkingDirectory=/opt/doc2mcp
-ExecStart=/usr/bin/node /opt/doc2mcp/dist/index.js
-Environment="DOC_URLS=https://api.example.com/openapi.json"
-Environment="TRACING_ENABLED=true"
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-```
-
-### PM2
+#### Docker
 
 ```bash
-pm2 start dist/index.js --name doc2mcp
+# Build the project first
+npm run build
+
+# Create Dockerfile (see DEPLOYMENT.md for production-ready version)
+docker build -t doc2mcp:latest .
+docker run -e DOC_URLS="https://api.example.com/openapi.json" \
+           -e TRACING_ENABLED=true \
+           doc2mcp:latest
 ```
+
+#### systemd Service
+
+```bash
+# 1. Build and copy files
+npm run build
+sudo mkdir -p /opt/doc2mcp
+sudo cp -r dist package*.json /opt/doc2mcp/
+
+# 2. Install dependencies
+cd /opt/doc2mcp && sudo npm ci --production
+
+# 3. Create service file at /etc/systemd/system/doc2mcp.service
+# (See DEPLOYMENT.md for complete service configuration)
+
+# 4. Start service
+sudo systemctl enable doc2mcp
+sudo systemctl start doc2mcp
+```
+
+#### PM2
+
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Start with environment variables
+pm2 start dist/index.js --name doc2mcp \
+  --env DOC_URLS="https://api.example.com/openapi.json"
+
+# Save PM2 configuration
+pm2 save
+pm2 startup
+```
+
+### Environment Configuration
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+cp .env.example .env
+# Edit .env with your settings
+```
+
+Required variables:
+- `DOC_URLS`: Comma-separated documentation URLs
+
+Optional variables:
+- `TRACING_ENABLED`: Enable Arize Phoenix tracing (default: true)
+- `ARIZE_ENDPOINT`: Phoenix endpoint URL
+- `ARIZE_API_KEY`: API key for authentication
+
+### Deployment Troubleshooting
+
+**Server won't start:**
+- Verify Node.js version: `node --version` (must be ≥18)
+- Check build output: `ls -la dist/`
+- Review logs for errors
+
+**Tools not generated:**
+- Verify DOC_URLS are accessible
+- Check documentation format is supported
+- Enable tracing to debug parsing issues
+
+**Tracing not working:**
+- Ensure Arize Phoenix is running: `docker run -p 6006:6006 arizephoenix/phoenix:latest`
+- Verify ARIZE_ENDPOINT is correct
+- Check network connectivity to endpoint
+
+For more details, see [DEPLOYMENT.md](./DEPLOYMENT.md).
 
 ## Examples
 
