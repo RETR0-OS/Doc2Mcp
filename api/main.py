@@ -7,6 +7,7 @@ import logging
 from datetime import datetime
 import sys
 import os
+import httpx
 
 # Add parent directory to path to import doc2mcp
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -29,6 +30,9 @@ app.add_middleware(
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Database URL for updating job status (Next.js web container)
+WEB_API_URL = os.environ.get("WEB_API_URL", "http://web:3000")
 
 # Initialize doc2mcp components (use default empty config)
 config = Config()
@@ -260,7 +264,7 @@ async def run_search_job(request: SearchRequest):
         await send_job_update(request.job_id, f"Error: {str(e)}")
 
 async def send_job_update(job_id: str, log_message: str):
-    """Send job update to WebSocket if connected"""
+    """Send job update to WebSocket if connected and sync to database"""
     if job_id in jobs:
         jobs[job_id].logs.append(log_message)
         
@@ -275,6 +279,31 @@ async def send_job_update(job_id: str, log_message: str):
                 })
             except:
                 pass
+        
+        # Sync to database via Next.js API
+        await sync_job_to_db(job_id)
+
+async def sync_job_to_db(job_id: str):
+    """Sync job status to the database via Next.js API"""
+    if job_id not in jobs:
+        return
+    
+    job = jobs[job_id]
+    try:
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                f"{WEB_API_URL}/api/jobs/{job_id}/update",
+                json={
+                    "status": job.status,
+                    "progress": job.progress,
+                    "logs": job.logs,
+                    "result": job.result,
+                    "error": job.error
+                },
+                timeout=5.0
+            )
+    except Exception as e:
+        logger.warning(f"Failed to sync job {job_id} to database: {e}")
 
 @app.websocket("/ws/jobs/{job_id}")
 async def websocket_endpoint(websocket: WebSocket, job_id: str):
