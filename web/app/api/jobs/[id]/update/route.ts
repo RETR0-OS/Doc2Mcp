@@ -28,7 +28,7 @@ export async function POST(
       )
     }
     
-    // Build update data
+    // Build update data - only include fields that exist in schema
     const updateData: any = {}
     
     if (status !== undefined) {
@@ -44,8 +44,9 @@ export async function POST(
       updateData.logs = JSON.stringify(logs)
     }
     
+    // Schema uses 'output' not 'result'
     if (result !== undefined) {
-      updateData.result = JSON.stringify(result)
+      updateData.output = JSON.stringify(result)
     }
     
     if (error !== undefined) {
