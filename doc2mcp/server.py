@@ -11,7 +11,7 @@ from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
 from doc2mcp.agents.doc_search import DocSearchAgent
-from doc2mcp.config import load_config
+from doc2mcp.config import load_config_with_fallback
 from doc2mcp.handlers import handle_list_tools, handle_search_docs
 from doc2mcp.indexer.registry import get_registry
 from doc2mcp.tracing.phoenix import init_tracing

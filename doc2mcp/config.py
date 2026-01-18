@@ -1,11 +1,15 @@
 """Configuration loading and validation for Doc2MCP."""
 
+import logging
 import os
 from pathlib import Path
 from typing import Literal
 
+import httpx
 import yaml
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
 
 
 class WebSource(BaseModel):
@@ -120,7 +124,7 @@ class Config(BaseModel):
 
 
 def load_config(config_path: str | Path | None = None) -> Config:
-    """Load configuration from YAML file.
+    """Load configuration from YAML file (fallback method).
 
     Args:
         config_path: Path to the config file. Defaults to TOOLS_CONFIG_PATH env var
@@ -141,3 +145,68 @@ def load_config(config_path: str | Path | None = None) -> Config:
         raw = yaml.safe_load(f) or {}
 
     return Config.model_validate(raw)
+
+
+async def load_config_from_api(api_url: str | None = None, timeout: float = 10.0) -> Config:
+    """Load configuration from the web API.
+
+    This fetches tool configurations from the database via the web API,
+    allowing dynamic configuration without restarting the server.
+
+    Args:
+        api_url: Base URL of the web API. Defaults to DOC2MCP_API_URL env var
+                 or http://localhost:3000.
+        timeout: Request timeout in seconds.
+
+    Returns:
+        Parsed configuration object.
+    """
+    if api_url is None:
+        api_url = os.environ.get("DOC2MCP_API_URL", "http://localhost:3000")
+
+    export_url = f"{api_url.rstrip('/')}/api/tools/export"
+    logger.info(f"Fetching tool config from {export_url}")
+
+    try:
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            response = await client.get(export_url)
+            response.raise_for_status()
+            raw = response.json()
+            logger.info(f"Fetched {len(raw.get('tools', {}))} tools from API")
+            return Config.model_validate(raw)
+    except httpx.HTTPStatusError as e:
+        logger.warning(f"API returned error {e.response.status_code}: {e.response.text}")
+        raise
+    except httpx.RequestError as e:
+        logger.warning(f"Failed to connect to API: {e}")
+        raise
+
+
+async def load_config_with_fallback(
+    api_url: str | None = None,
+    config_path: str | Path | None = None,
+) -> Config:
+    """Load configuration from API with fallback to YAML file.
+
+    First attempts to load from the web API. If that fails, falls back to
+    loading from the YAML config file.
+
+    Args:
+        api_url: Base URL of the web API.
+        config_path: Path to fallback YAML config file.
+
+    Returns:
+        Parsed configuration object.
+    """
+    # Check if API loading is enabled (default: enabled)
+    use_api = os.environ.get("DOC2MCP_USE_API", "true").lower() in ("true", "1", "yes")
+
+    if use_api:
+        try:
+            return await load_config_from_api(api_url)
+        except Exception as e:
+            logger.warning(f"Failed to load config from API, falling back to YAML: {e}")
+
+    # Fallback to YAML
+    return load_config(config_path)
+
