@@ -10,7 +10,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Tools', href: '/dashboard/tools', icon: Wrench },
   { name: 'Jobs', href: '/dashboard/jobs', icon: Activity },
-  { name: 'Config', href: '/dashboard/config', icon: Code },
+  { name: 'Docs', href: '/dashboard/config', icon: Code },
   { name: 'Phoenix', href: '/dashboard/phoenix', icon: Eye },
 ]
 
