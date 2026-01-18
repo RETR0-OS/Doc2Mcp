@@ -7,7 +7,14 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm ci
+# Use `npm ci` when a lockfile exists for reproducible installs,
+# otherwise fall back to `npm install` so the image builds even
+# when a lockfile isn't present in the repository.
+RUN if [ -f package-lock.json ]; then \
+			npm ci; \
+		else \
+			npm install; \
+		fi
 
 # Rebuild the source code only when needed
 FROM base AS builder
