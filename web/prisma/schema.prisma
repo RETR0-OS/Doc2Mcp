@@ -1,0 +1,60 @@
+// Prisma schema for Doc2MCP
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  clerkId   String   @unique
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  tools Tool[]
+  jobs  Job[]
+}
+
+model Tool {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  toolId      String   // e.g., "anthropic"
+  name        String
+  description String
+  sources     String   // JSON string: Array of source configs
+  enabled     Boolean  @default(true)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, toolId])
+  @@index([userId])
+}
+
+model Job {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type        String    // "index", "search", "sync"
+  status      String    // "pending", "running", "completed", "failed", "cancelled"
+  input       String    // JSON string
+  output      String?   // JSON string
+  progress    Int       @default(0)
+  logs        String    @default("[]") // JSON array of log entries
+  error       String?
+  
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  
+  @@index([userId, status])
+  @@index([createdAt])
+}

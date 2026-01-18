@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # Next.js Frontend
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:/app/data/dev.db
+      - REDIS_URL=redis://redis:6379
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - API_URL=http://api:8000
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+    env_file:
+      - ./web/.env
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - ./web/data:/app/data
+    depends_on:
+      - redis
+      - api
+    networks:
+      - doc2mcp
+    restart: unless-stopped
+
+  # FastAPI Backend
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=file:../web/data/dev.db
+    env_file:
+      - .env
+    volumes:
+      - ./api:/app
+      - ./doc2mcp:/app/doc2mcp
+      - ./web/data:/app/data
+      - ./doc_cache.json:/app/doc_cache.json
+      - ./tools.yaml:/app/tools.yaml
+    depends_on:
+      - redis
+    networks:
+      - doc2mcp
+    restart: unless-stopped
+
+  # Redis for job queue and caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - doc2mcp
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # Phoenix Observability
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    ports:
+      - "6006:6006"
+      - "4317:4317"  # gRPC
+      - "4318:4318"  # HTTP
+    environment:
+      - PHOENIX_WORKING_DIR=/phoenix
+    volumes:
+      - phoenix-data:/phoenix
+    networks:
+      - doc2mcp
+    restart: unless-stopped
+
+  # MCP Server (for standalone testing)
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./doc2mcp:/app/doc2mcp
+      - ./doc_cache.json:/app/doc_cache.json
+      - ./tools.yaml:/app/tools.yaml
+    depends_on:
+      - redis
+    networks:
+      - doc2mcp
+    restart: unless-stopped
+    command: python -m doc2mcp.server
+
+volumes:
+  redis-data:
+  phoenix-data:
+
+networks:
+  doc2mcp:
+    driver: bridge

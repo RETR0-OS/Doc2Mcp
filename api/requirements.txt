@@ -1,0 +1,14 @@
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+httpx==0.26.0
+redis==5.0.1
+python-multipart==0.0.6
+
+# Doc2MCP dependencies
+mcp>=1.0.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+pyyaml>=6.0
+google-genai>=0.2.0
+python-dotenv>=1.0.0
