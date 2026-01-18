@@ -32,11 +32,19 @@ export default async function DashboardPage() {
   }
 
   // Get recent jobs
-  const recentJobs = await prisma.job.findMany({
+  const recentJobsRaw = await prisma.job.findMany({
     where: { userId: dbUser.id },
     orderBy: { createdAt: 'desc' },
     take: 5,
   })
+
+  // Serialize dates to strings for client component compatibility
+  const recentJobs = recentJobsRaw.map(job => ({
+    ...job,
+    createdAt: job.createdAt.toISOString(),
+    startedAt: job.startedAt?.toISOString() ?? null,
+    completedAt: job.completedAt?.toISOString() ?? null,
+  }))
 
   const completedJobs = recentJobs.filter(j => j.status === 'completed').length
   const runningJobs = recentJobs.filter(j => j.status === 'running').length

@@ -27,6 +27,14 @@ export default async function ConfigPage() {
     })
   }
 
+  // Serialize tools for client component (only include needed fields)
+  const tools = dbUser.tools.map(tool => ({
+    toolId: tool.toolId,
+    name: tool.name,
+    description: tool.description,
+    sources: tool.sources,
+  }))
+
   return (
     <div className="max-w-4xl space-y-6">
       <div>
@@ -36,7 +44,7 @@ export default async function ConfigPage() {
         </p>
       </div>
 
-      <ConfigGenerator tools={dbUser.tools} userEmail={dbUser.email} />
+      <ConfigGenerator tools={tools} userEmail={dbUser.email} />
     </div>
   )
 }

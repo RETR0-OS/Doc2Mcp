@@ -108,6 +108,7 @@ open http://localhost:3000
 - Google Gemini AI
 - Jina Reader for web scraping
 - WebSockets
+- **tokenc** - Token compression for reduced LLM costs
 
 ### Infrastructure
 - Docker & Docker Compose
@@ -157,12 +158,16 @@ python -m doc2mcp.server
 Get your keys:
 - **Clerk**: https://dashboard.clerk.com
 - **Google AI**: https://aistudio.google.com/app/apikey
+- **The Token Company** (optional): https://thetokencompany.com
 
 Required in `.env`:
 ```bash
 GOOGLE_API_KEY=...
 CLERK_SECRET_KEY=sk_test_...
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+
+# Optional: Enable token compression to reduce LLM costs
+TOKENC_API_KEY=...  # Get from https://thetokencompany.com
 ```
 
 ## 🤝 Contributing

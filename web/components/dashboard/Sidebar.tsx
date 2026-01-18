@@ -14,7 +14,12 @@ const navigation = [
   { name: 'Phoenix', href: '/dashboard/phoenix', icon: Eye },
 ]
 
-export function Sidebar({ user }: { user: any }) {
+interface UserData {
+  firstName: string | null
+  email: string
+}
+
+export function Sidebar({ user }: { user: UserData }) {
   const pathname = usePathname()
 
   return (
@@ -30,7 +35,7 @@ export function Sidebar({ user }: { user: any }) {
         {navigation.map((item) => {
           const isActive = pathname === item.href
           const Icon = item.icon
-          
+
           return (
             <Link
               key={item.name}
@@ -54,9 +59,9 @@ export function Sidebar({ user }: { user: any }) {
         <div className="flex items-center gap-3 px-2 py-2">
           <UserButton afterSignOutUrl="/" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{user.firstName || user.emailAddresses[0].emailAddress}</p>
+            <p className="text-sm font-medium truncate">{user.firstName || user.email}</p>
             <p className="text-xs text-muted-foreground truncate">
-              {user.emailAddresses[0].emailAddress}
+              {user.email}
             </p>
           </div>
         </div>

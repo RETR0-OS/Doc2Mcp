@@ -35,12 +35,41 @@ class ToolConfig(BaseModel):
     sources: list[WebSource | LocalSource]
 
 
+class CompressionSettings(BaseModel):
+    """Settings for token compression using tokenc."""
+
+    enabled: bool = True
+    aggressiveness: float = Field(
+        default=0.5,
+        ge=0.0,
+        le=1.0,
+        description="Compression aggressiveness (0.0-1.0). Higher = more compression.",
+    )
+    min_content_length: int = Field(
+        default=1000,
+        description="Minimum content length to trigger compression.",
+    )
+    analysis_aggressiveness: float = Field(
+        default=0.4,
+        ge=0.0,
+        le=1.0,
+        description="Compression level for page analysis (moderate).",
+    )
+    synthesis_aggressiveness: float = Field(
+        default=0.3,
+        ge=0.0,
+        le=1.0,
+        description="Compression level for answer synthesis (light).",
+    )
+
+
 class Settings(BaseModel):
     """Global settings for Doc2MCP."""
 
     max_content_length: int = 50000
     cache_ttl: int = 3600
     request_timeout: int = 30
+    compression: CompressionSettings = Field(default_factory=CompressionSettings)
 
 
 class Config(BaseModel):

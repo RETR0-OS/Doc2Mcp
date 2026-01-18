@@ -25,10 +25,17 @@ export default async function ToolsPage() {
   }
 
   // Get user's tools
-  const tools = await prisma.tool.findMany({
+  const toolsRaw = await prisma.tool.findMany({
     where: { userId: dbUser.id },
     orderBy: { createdAt: 'desc' },
   })
+
+  // Serialize dates for client component
+  const tools = toolsRaw.map(tool => ({
+    ...tool,
+    createdAt: tool.createdAt.toISOString(),
+    updatedAt: tool.updatedAt.toISOString(),
+  }))
 
   return (
     <div className="space-y-6">

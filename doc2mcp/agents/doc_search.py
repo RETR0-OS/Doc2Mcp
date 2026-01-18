@@ -10,6 +10,7 @@ from google.genai import types
 from opentelemetry import trace
 
 from doc2mcp.cache import PageCache
+from doc2mcp.compression import ContentCompressor
 from doc2mcp.config import Config, LocalSource, ToolConfig, WebSource
 from doc2mcp.fetchers.local import LocalFetcher
 from doc2mcp.fetchers.web import FetchResult, WebFetcher
@@ -41,6 +42,14 @@ class DocSearchAgent:
         self.web_fetcher = WebFetcher(timeout=config.settings.request_timeout)
         self.local_fetcher = LocalFetcher()
         self.cache = PageCache(cache_path)
+
+        # Initialize content compressor for token optimization
+        compression_settings = config.settings.compression
+        self.compressor = ContentCompressor(
+            aggressiveness=compression_settings.aggressiveness,
+            min_content_length=compression_settings.min_content_length,
+            enabled=compression_settings.enabled,
+        )
 
         # Initialize Gemini client
         api_key = os.environ.get("GOOGLE_API_KEY")
@@ -324,6 +333,13 @@ Do NOT make up information - only use what's in the provided documentation."""
         # Truncate content for analysis
         content = fetch_result.content[:50000]
 
+        # Compress content to reduce token usage
+        compression_settings = self.config.settings.compression
+        compressed_content = self.compressor.compress(
+            content,
+            aggressiveness=compression_settings.analysis_aggressiveness,
+        )
+
         # Format links for the prompt
         links_text = "\n".join(
             f"- [{link['text']}]({link['url']})"
@@ -336,7 +352,7 @@ Current page: {fetch_result.url}
 Title: {fetch_result.title}
 
 Page content:
-{content}
+{compressed_content.compressed_text}
 
 Available links on this page:
 {links_text}
@@ -345,6 +361,10 @@ Analyze this page and respond with a JSON object."""
 
         with self.tracer.start_as_current_span("nav_decision") as span:
             span.set_attribute("url", fetch_result.url)
+            span.set_attribute("content_compressed", compressed_content.was_compressed)
+            if compressed_content.was_compressed:
+                span.set_attribute("tokens_saved", compressed_content.tokens_saved)
+                span.set_attribute("compression_ratio", compressed_content.compression_ratio)
 
             try:
                 response = await self.client.aio.models.generate_content(
@@ -411,15 +431,27 @@ Analyze this page and respond with a JSON object."""
         if len(combined) > 100000:
             combined = combined[:100000] + "\n\n[Content truncated...]"
 
+        # Compress combined content to reduce token usage (light compression for synthesis)
+        compression_settings = self.config.settings.compression
+        compressed_content = self.compressor.compress(
+            combined,
+            aggressiveness=compression_settings.synthesis_aggressiveness,
+        )
+
         prompt = f"""Query: {query}
 
 Documentation excerpts found:
 
-{combined}
+{compressed_content.compressed_text}
 
 Please synthesize a comprehensive answer to the query using the documentation above. Include code examples if available."""
 
         with self.tracer.start_as_current_span("synthesis") as span:
+            span.set_attribute("content_compressed", compressed_content.was_compressed)
+            if compressed_content.was_compressed:
+                span.set_attribute("tokens_saved", compressed_content.tokens_saved)
+                span.set_attribute("compression_ratio", compressed_content.compression_ratio)
+
             response = await self.client.aio.models.generate_content(
                 model=self.synthesis_model_name,
                 contents=prompt,

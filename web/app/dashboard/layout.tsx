@@ -8,14 +8,20 @@ export default async function DashboardLayout({
   children: React.ReactNode
 }) {
   const user = await currentUser()
-  
+
   if (!user) {
     redirect('/')
   }
 
+  // Serialize only the needed user data for client component
+  const userData = {
+    firstName: user.firstName,
+    email: user.emailAddresses[0]?.emailAddress ?? '',
+  }
+
   return (
     <div className="min-h-screen flex">
-      <Sidebar user={user} />
+      <Sidebar user={userData} />
       <main className="flex-1 ml-64">
         <div className="p-8">
           {children}
