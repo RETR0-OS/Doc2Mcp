@@ -1,6 +1,5 @@
 """Tool registry that manages auto-generated MCP tools with lazy content loading."""
 
-import asyncio
 import hashlib
 import json
 import logging

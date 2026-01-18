@@ -1,6 +1,5 @@
 """Doc2MCP - MCP server for tool documentation search."""
 
-import asyncio
 import logging
 import os
 from pathlib import Path

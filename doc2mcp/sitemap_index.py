@@ -7,7 +7,6 @@ This module provides lazy indexing of documentation sites by:
 """
 
 import asyncio
-import hashlib
 import json
 import re
 import xml.etree.ElementTree as ET
