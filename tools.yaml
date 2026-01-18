@@ -1,0 +1,53 @@
+# Doc2MCP Tool Registry
+# This file maps tool names to their documentation sources
+
+tools:
+  # Example: Anthropic Claude API
+  anthropic:
+    name: "Anthropic Claude API"
+    description: "Claude AI assistant API documentation"
+    sources:
+      - type: web
+        url: "https://docs.anthropic.com/en/api"
+        selectors:
+          content: "main, article, .content"
+          exclude: "nav, footer, .sidebar"
+      - type: web
+        url: "https://docs.anthropic.com/en/docs"
+
+  # Example: OpenAI API
+  openai:
+    name: "OpenAI API"
+    description: "OpenAI GPT and related APIs documentation"
+    sources:
+      - type: web
+        url: "https://platform.openai.com/docs"
+
+  babylon:
+    name: "Babylon JS"
+    description: "Babylon.js 3D engine documentation"
+    sources:
+      - type: web
+        url: "https://doc.babylonjs.com/"
+
+  # Example: Local documentation
+  # my_tool:
+  #   name: "My Internal Tool"
+  #   description: "Internal tool documentation"
+  #   sources:
+  #     - type: local
+  #       path: "./docs/my_tool"
+  #       patterns:
+  #         - "*.md"
+  #         - "*.txt"
+
+# Global settings
+settings:
+  # Maximum content length to return (in characters)
+  max_content_length: 50000
+
+  # Cache duration for web-fetched docs (in seconds)
+  cache_ttl: 3600
+
+  # Default timeout for web requests (in seconds)
+  request_timeout: 30
