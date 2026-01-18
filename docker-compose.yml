@@ -87,6 +87,7 @@ services:
       - DOC2MCP_CACHE_DIR=/app/.doc2mcp_cache
       - DOC2MCP_API_URL=http://web:3000
       - DOC2MCP_USE_API=true
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://phoenix:4317
     volumes:
       - ./doc2mcp:/app/doc2mcp
       - ./doc_cache.json:/app/doc_cache.json
@@ -94,6 +95,7 @@ services:
     depends_on:
       - redis
       - web
+      - phoenix
     networks:
       - doc2mcp
     restart: "no"

@@ -37,7 +37,8 @@
       "cwd": "/home/ash/projects/Doc2Mcp",
       "env": {
         "GOOGLE_API_KEY": "${input:GOOGLE_API_KEY}",
-        "TOOLS_CONFIG_PATH": "/home/ash/projects/Doc2Mcp/tools.yaml"
+        "TOOLS_CONFIG_PATH": "/home/ash/projects/Doc2Mcp/tools.yaml",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317"
       },
       "type": "stdio"
     }
