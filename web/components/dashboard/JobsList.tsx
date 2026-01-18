@@ -276,9 +276,9 @@ export function JobsList({ jobs: initialJobs }: { jobs: Job[] }) {
                     variant="ghost"
                     size="sm"
                     onClick={(e) => deleteJob(job.id, e)}
-                    disabled={deletingIds.has(job.id) || job.status === 'running'}
+                    disabled={deletingIds.has(job.id)}
                     className="gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50"
-                    title={job.status === 'running' ? 'Cannot delete running job' : 'Delete job'}
+                    title="Delete job"
                   >
                     {deletingIds.has(job.id) ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />

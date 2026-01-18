@@ -4,10 +4,11 @@ import { prisma } from '@/lib/db'
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = auth()
+    const { id } = await params
+    const { userId } = await auth()
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -22,7 +23,7 @@ export async function GET(
 
     const tool = await prisma.tool.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
     })
@@ -40,10 +41,11 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = auth()
+    const { id } = await params
+    const { userId } = await auth()
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -61,7 +63,7 @@ export async function PUT(
 
     const tool = await prisma.tool.updateMany({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
       data: {
@@ -84,10 +86,11 @@ export async function PUT(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = auth()
+    const { id } = await params
+    const { userId } = await auth()
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -105,7 +108,7 @@ export async function PATCH(
 
     const tool = await prisma.tool.updateMany({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
       data: { enabled },
@@ -124,10 +127,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = auth()
+    const { id } = await params
+    const { userId } = await auth()
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -142,7 +146,7 @@ export async function DELETE(
 
     const tool = await prisma.tool.deleteMany({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
     })

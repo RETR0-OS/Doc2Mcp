@@ -5,10 +5,11 @@ import { prisma } from '@/lib/db'
 // GET single job
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = auth()
+    const { id } = await params
+    const { userId } = await auth()
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -23,7 +24,7 @@ export async function GET(
 
     const job = await prisma.job.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
     })
@@ -42,10 +43,11 @@ export async function GET(
 // DELETE job
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = auth()
+    const { id } = await params
+    const { userId } = await auth()
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -61,7 +63,7 @@ export async function DELETE(
     // Check job exists and belongs to user
     const job = await prisma.job.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
     })
@@ -72,7 +74,7 @@ export async function DELETE(
 
     // Delete the job
     await prisma.job.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true, message: 'Job deleted' })

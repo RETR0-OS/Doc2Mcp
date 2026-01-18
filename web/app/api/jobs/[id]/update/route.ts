@@ -5,13 +5,28 @@ import { NextResponse } from 'next/server'
 // No auth required - only accessible from internal network
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     
+    console.log(`[Job Update] Updating job ${id}:`, body)
+    
     const { status, progress, logs, result, error } = body
+    
+    // Check if job exists first
+    const existingJob = await prisma.job.findUnique({
+      where: { id }
+    })
+    
+    if (!existingJob) {
+      console.error(`[Job Update] Job ${id} not found`)
+      return NextResponse.json(
+        { error: 'Job not found' },
+        { status: 404 }
+      )
+    }
     
     // Build update data
     const updateData: any = {}
@@ -47,11 +62,12 @@ export async function POST(
       data: updateData
     })
     
+    console.log(`[Job Update] Job ${id} updated successfully`)
     return NextResponse.json({ success: true, job })
   } catch (error) {
     console.error('Failed to update job:', error)
     return NextResponse.json(
-      { error: 'Failed to update job' },
+      { error: 'Failed to update job', details: String(error) },
       { status: 500 }
     )
   }
