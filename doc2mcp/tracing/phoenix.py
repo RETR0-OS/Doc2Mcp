@@ -1,9 +1,11 @@
 """Arize Phoenix tracing setup for observability."""
 
+import functools
 import logging
 import os
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 # Global tracer instance
 _tracer: Any | None = None
@@ -151,3 +153,36 @@ def trace_doc_retrieval(
         span.set_attribute("doc.query", query)
         span.set_attribute("doc.sources", str(sources))
         span.set_attribute("doc.content_length", content_length)
+
+
+@contextmanager
+def trace_mcp_call(tool_name: str, arguments: dict[str, Any] | None = None):
+    """Context manager to trace an MCP tool call.
+
+    Args:
+        tool_name: Name of the MCP tool being called.
+        arguments: Arguments passed to the tool.
+
+    Yields:
+        The span for additional attributes.
+    """
+    tracer = get_tracer()
+    if tracer is None:
+        yield None
+        return
+
+    with tracer.start_as_current_span(
+        "mcp_tool_call",
+        attributes={
+            "mcp.tool_name": tool_name,
+            "mcp.arguments": str(arguments) if arguments else "{}",
+        },
+    ) as span:
+        try:
+            yield span
+            span.set_attribute("mcp.status", "success")
+        except Exception as e:
+            span.set_attribute("mcp.status", "error")
+            span.set_attribute("mcp.error", str(e))
+            span.record_exception(e)
+            raise
