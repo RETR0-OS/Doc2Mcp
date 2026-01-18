@@ -15,8 +15,6 @@ services:
     env_file:
       - ./web/.env
     volumes:
-      - ./web:/app
-      - /app/node_modules
       - ./web/data:/app/data
     depends_on:
       - redis
