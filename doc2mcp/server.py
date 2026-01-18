@@ -127,15 +127,8 @@ async def run_server() -> None:
 
     init_tracing("doc2mcp")
 
-    # Find config file
-    config_path = os.environ.get("TOOLS_CONFIG_PATH")
-    if not config_path:
-        for path in [Path("./tools.yaml"), Path(__file__).parent.parent / "tools.yaml"]:
-            if path.exists():
-                config_path = str(path)
-                break
-
-    config = load_config(config_path)
+    # Load config from API (with fallback to YAML file)
+    config = await load_config_with_fallback()
     logger.info(f"Loaded {len(config.tools)} tools from config")
 
     _agent = DocSearchAgent(config)
