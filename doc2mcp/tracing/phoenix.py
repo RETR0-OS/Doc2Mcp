@@ -1,21 +1,32 @@
 """Arize Phoenix tracing setup for observability."""
 
+import logging
 import os
 from pathlib import Path
 from typing import Any
 
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor
-
 # Global tracer instance
-_tracer: trace.Tracer | None = None
+_tracer: Any | None = None
+_tracing_available = False
+
+# Try to import tracing dependencies
+try:
+    from opentelemetry import trace
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+    _tracing_available = True
+except ImportError:
+    trace = None
+    TracerProvider = None
+    SimpleSpanProcessor = None
+
+logger = logging.getLogger(__name__)
 
 # Default Phoenix data directory (stable path, not temp)
 DEFAULT_PHOENIX_DIR = Path("./phoenix_data")
 
 
-def init_tracing(service_name: str = "doc2mcp") -> trace.Tracer:
+def init_tracing(service_name: str = "doc2mcp") -> Any:
     """Initialize Arize Phoenix tracing.
 
     This sets up OpenTelemetry tracing with Phoenix as the backend.
@@ -26,12 +37,16 @@ def init_tracing(service_name: str = "doc2mcp") -> trace.Tracer:
         service_name: Name of the service for tracing.
 
     Returns:
-        Configured tracer instance.
+        Configured tracer instance or None if tracing is not available.
     """
     global _tracer
 
     if _tracer is not None:
         return _tracer
+
+    if not _tracing_available:
+        logger.info("Tracing not available - opentelemetry not installed")
+        return None
 
     # Import Phoenix here to avoid import errors if not installed
     try:
@@ -39,6 +54,7 @@ def init_tracing(service_name: str = "doc2mcp") -> trace.Tracer:
         from phoenix.otel import register
     except ImportError:
         # Phoenix not installed, return a no-op tracer
+        logger.info("Phoenix not installed - tracing disabled")
         provider = TracerProvider()
         trace.set_tracer_provider(provider)
         _tracer = trace.get_tracer(service_name)

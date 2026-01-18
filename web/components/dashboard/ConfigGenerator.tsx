@@ -3,13 +3,66 @@
 import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Check, Copy, FileJson, Download, Terminal } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Check, Copy, FileJson, Download, Terminal, Code, MousePointer2, X, Zap } from 'lucide-react'
 
 interface Tool {
   toolId: string
   name: string
   description: string
   sources: string
+}
+
+type LLMProvider = 'gemini' | 'openai' | 'local'
+
+// Generate VS Code deeplink
+const getVSCodeInstallLink = (provider: LLMProvider, apiKey: string, localUrl: string, insiders: boolean = false) => {
+  const env: Record<string, string> = {
+    LLM_PROVIDER: provider,
+    TOOLS_CONFIG_PATH: "./tools.yaml"
+  }
+  
+  if (provider === 'gemini') {
+    env.GOOGLE_API_KEY = apiKey || "${input:google_api_key}"
+  } else if (provider === 'openai') {
+    env.OPENAI_API_KEY = apiKey || "${input:openai_api_key}"
+  } else if (provider === 'local') {
+    env.LOCAL_LLM_URL = localUrl || "${input:local_llm_url}"
+  }
+
+  const config = {
+    name: "doc2mcp",
+    command: "doc2mcp",
+    args: [],
+    env
+  }
+  const scheme = insiders ? 'vscode-insiders' : 'vscode'
+  return `${scheme}:mcp/install?${encodeURIComponent(JSON.stringify(config))}`
+}
+
+// Generate Cursor deeplink
+const getCursorInstallLink = (provider: LLMProvider, apiKey: string, localUrl: string) => {
+  const env: Record<string, string> = {
+    LLM_PROVIDER: provider,
+    TOOLS_CONFIG_PATH: "./tools.yaml"
+  }
+  
+  if (provider === 'gemini') {
+    env.GOOGLE_API_KEY = apiKey || "${GOOGLE_API_KEY}"
+  } else if (provider === 'openai') {
+    env.OPENAI_API_KEY = apiKey || "${OPENAI_API_KEY}"
+  } else if (provider === 'local') {
+    env.LOCAL_LLM_URL = localUrl || "${LOCAL_LLM_URL}"
+  }
+
+  const config = {
+    command: "doc2mcp",
+    args: [],
+    env
+  }
+  const base64Config = btoa(JSON.stringify(config))
+  return `cursor://anysphere.cursor-deeplink/mcp/install?name=doc2mcp&config=${base64Config}`
 }
 
 // Generate tools.yaml content
@@ -46,6 +99,40 @@ ${toolsConfig}
 export function ConfigGenerator({ tools, userEmail }: { tools: Tool[]; userEmail: string }) {
   const [copied, setCopied] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'vscode' | 'cursor'>('vscode')
+  
+  // Provider modal state
+  const [showProviderModal, setShowProviderModal] = useState(false)
+  const [targetEditor, setTargetEditor] = useState<'vscode' | 'cursor' | null>(null)
+  const [selectedProvider, setSelectedProvider] = useState<LLMProvider>('gemini')
+  const [apiKey, setApiKey] = useState('')
+  const [localUrl, setLocalUrl] = useState('http://localhost:11434')
+
+  const openProviderModal = (editor: 'vscode' | 'cursor') => {
+    setTargetEditor(editor)
+    setShowProviderModal(true)
+    setSelectedProvider('gemini')
+    setApiKey('')
+    setLocalUrl('http://localhost:11434')
+  }
+
+  const closeProviderModal = () => {
+    setShowProviderModal(false)
+    setTargetEditor(null)
+  }
+
+  const handleInstall = () => {
+    if (!targetEditor) return
+    
+    let link: string
+    if (targetEditor === 'vscode') {
+      link = getVSCodeInstallLink(selectedProvider, apiKey, localUrl)
+    } else {
+      link = getCursorInstallLink(selectedProvider, apiKey, localUrl)
+    }
+    
+    window.location.href = link
+    closeProviderModal()
+  }
 
   // Generate full MCP config for different clients
   const generateConfig = (client: 'vscode' | 'cursor') => {
@@ -118,6 +205,132 @@ export function ConfigGenerator({ tools, userEmail }: { tools: Tool[]; userEmail
 
   return (
     <div className="space-y-6">
+      {/* Provider Selection Modal */}
+      {showProviderModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={closeProviderModal} />
+          <div className="relative bg-background border rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
+            <button
+              onClick={closeProviderModal}
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            
+            <h2 className="text-lg font-semibold mb-1">
+              Add to {targetEditor === 'vscode' ? 'VS Code' : 'Cursor'}
+            </h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Select your LLM provider for Doc2MCP
+            </p>
+
+            {/* Provider Selection */}
+            <div className="space-y-3 mb-4">
+              <Label className="text-sm font-medium">LLM Provider</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {(['gemini', 'openai', 'local'] as const).map((provider) => (
+                  <button
+                    key={provider}
+                    onClick={() => setSelectedProvider(provider)}
+                    className={`px-3 py-2 rounded-md text-sm font-medium border transition-colors ${
+                      selectedProvider === provider
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-background hover:bg-muted border-border'
+                    }`}
+                  >
+                    {provider === 'gemini' ? 'Gemini' : provider === 'openai' ? 'OpenAI' : 'Local'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* API Key / URL Input */}
+            <div className="space-y-2 mb-6">
+              {selectedProvider === 'gemini' && (
+                <>
+                  <Label htmlFor="api-key" className="text-sm font-medium">
+                    Google API Key <span className="text-muted-foreground">(optional)</span>
+                  </Label>
+                  <Input
+                    id="api-key"
+                    type="password"
+                    placeholder="Leave empty to prompt in editor"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                  />
+                </>
+              )}
+              {selectedProvider === 'openai' && (
+                <>
+                  <Label htmlFor="api-key" className="text-sm font-medium">
+                    OpenAI API Key <span className="text-muted-foreground">(optional)</span>
+                  </Label>
+                  <Input
+                    id="api-key"
+                    type="password"
+                    placeholder="Leave empty to prompt in editor"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                  />
+                </>
+              )}
+              {selectedProvider === 'local' && (
+                <>
+                  <Label htmlFor="local-url" className="text-sm font-medium">
+                    Local LLM URL
+                  </Label>
+                  <Input
+                    id="local-url"
+                    type="text"
+                    placeholder="http://localhost:11434"
+                    value={localUrl}
+                    onChange={(e) => setLocalUrl(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Ollama default: http://localhost:11434
+                  </p>
+                </>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={closeProviderModal} className="flex-1">
+                Cancel
+              </Button>
+              <Button onClick={handleInstall} className="flex-1">
+                Install
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Install Card */}
+      <Card className="border-primary/50 bg-primary/5">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-primary" />
+            Quick Install
+          </CardTitle>
+          <CardDescription>
+            One-click installation of Doc2MCP server to your editor
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-3">
+            <Button onClick={() => openProviderModal('vscode')} className="gap-2 flex-1">
+              <Code className="h-4 w-4" />
+              Add to VS Code
+            </Button>
+            <Button onClick={() => openProviderModal('cursor')} variant="outline" className="gap-2 flex-1">
+              <MousePointer2 className="h-4 w-4" />
+              Add to Cursor
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Manual Setup Card */}
       <Card>
         <CardHeader>
