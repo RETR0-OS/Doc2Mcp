@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Check, Copy, FileJson, Download, Zap, Terminal, FolderOpen, ExternalLink } from 'lucide-react'
+import { Check, Copy, FileJson, Download, Zap, Sparkles, CheckCircle2 } from 'lucide-react'
 
 interface Tool {
   toolId: string
@@ -15,6 +15,8 @@ interface Tool {
 export function ConfigGenerator({ tools, userEmail }: { tools: Tool[]; userEmail: string }) {
   const [copied, setCopied] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'vscode' | 'claude' | 'cursor'>('vscode')
+  const [installStatus, setInstallStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
+  const [statusMessage, setStatusMessage] = useState('')
 
   // Generate MCP config for different clients
   const generateConfig = (client: 'vscode' | 'claude' | 'cursor') => {
@@ -30,12 +32,6 @@ export function ConfigGenerator({ tools, userEmail }: { tools: Tool[]; userEmail
     if (client === 'vscode') {
       return {
         servers: {
-          "doc2mcp": baseConfig
-        }
-      }
-    } else if (client === 'cursor') {
-      return {
-        mcpServers: {
           "doc2mcp": baseConfig
         }
       }
@@ -57,6 +53,60 @@ export function ConfigGenerator({ tools, userEmail }: { tools: Tool[]; userEmail
     setTimeout(() => setCopied(null), 2000)
   }
 
+  // One-click install using File System Access API
+  const quickInstall = async () => {
+    setInstallStatus('saving')
+    
+    try {
+      // Check if File System Access API is supported
+      if (!('showSaveFilePicker' in window)) {
+        throw new Error('Your browser does not support direct file saving. Please use Chrome or Edge.')
+      }
+
+      // First, save mcp.json
+      setStatusMessage('Select location for mcp.json (save to .vscode/ folder)...')
+      
+      const mcpHandle = await (window as any).showSaveFilePicker({
+        suggestedName: 'mcp.json',
+        types: [{
+          description: 'JSON Files',
+          accept: { 'application/json': ['.json'] }
+        }]
+      })
+      
+      const mcpWritable = await mcpHandle.createWritable()
+      await mcpWritable.write(JSON.stringify(config, null, 2))
+      await mcpWritable.close()
+
+      // Then save tools.yaml
+      setStatusMessage('Now select location for tools.yaml (save to project root)...')
+      
+      const yamlHandle = await (window as any).showSaveFilePicker({
+        suggestedName: 'tools.yaml',
+        types: [{
+          description: 'YAML Files',
+          accept: { 'text/yaml': ['.yaml', '.yml'] }
+        }]
+      })
+      
+      const yamlWritable = await yamlHandle.createWritable()
+      await yamlWritable.write(toolsYaml)
+      await yamlWritable.close()
+
+      setInstallStatus('success')
+      setStatusMessage('✅ Both files saved! Now run: pip install doc2mcp')
+
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        setInstallStatus('idle')
+        setStatusMessage('')
+      } else {
+        setInstallStatus('error')
+        setStatusMessage(err.message)
+      }
+    }
+  }
+
   const downloadFile = (content: string, filename: string, type: string = 'application/json') => {
     const blob = new Blob([content], { type })
     const url = URL.createObjectURL(blob)
@@ -67,95 +117,6 @@ export function ConfigGenerator({ tools, userEmail }: { tools: Tool[]; userEmail
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  }
-
-  const downloadMcpJson = () => {
-    downloadFile(JSON.stringify(config, null, 2), 'mcp.json')
-  }
-
-  const downloadToolsYaml = () => {
-    downloadFile(toolsYaml, 'tools.yaml', 'text/yaml')
-  }
-
-  const downloadSetupScript = () => {
-    const isWindows = navigator.userAgent.includes('Windows')
-    
-    if (isWindows) {
-      const script = `@echo off
-REM Doc2MCP Setup Script for Windows
-REM Run this in your project directory
-
-echo Setting up Doc2MCP...
-
-REM Install doc2mcp
-pip install doc2mcp
-
-REM Create tools.yaml
-echo Creating tools.yaml...
-(
-${toolsYaml.split('\n').map(line => `echo ${line.replace(/"/g, '\\"')}`).join('\n')}
-) > tools.yaml
-
-REM Create .vscode directory if it doesn't exist  
-if not exist ".vscode" mkdir .vscode
-
-REM Create MCP config
-echo Creating .vscode/mcp.json...
-echo ${JSON.stringify(config).replace(/"/g, '\\"')} > .vscode\\mcp.json
-
-echo.
-echo Setup complete! 
-echo.
-echo Next steps:
-echo 1. Set your GOOGLE_API_KEY environment variable
-echo 2. Reload VS Code (Ctrl+Shift+P then "Developer: Reload Window")
-echo 3. Start using @doc2mcp in Copilot Chat!
-pause
-`
-      downloadFile(script, 'setup-doc2mcp.bat', 'text/plain')
-    } else {
-      const script = `#!/bin/bash
-# Doc2MCP Setup Script
-# Run this in your project directory
-
-set -e
-
-echo "🚀 Setting up Doc2MCP..."
-
-# Install doc2mcp
-echo "📦 Installing doc2mcp..."
-pip install doc2mcp
-
-# Create tools.yaml
-echo "📝 Creating tools.yaml..."
-cat > tools.yaml << 'TOOLSEOF'
-${toolsYaml}
-TOOLSEOF
-
-# Create .vscode directory if it doesn't exist
-mkdir -p .vscode
-
-# Create MCP config for VS Code workspace
-echo "⚙️ Creating .vscode/mcp.json..."
-cat > .vscode/mcp.json << 'MCPEOF'
-${JSON.stringify(config, null, 2)}
-MCPEOF
-
-echo ""
-echo "✅ Setup complete!"
-echo ""
-echo "Next steps:"
-echo "1. Set your GOOGLE_API_KEY: export GOOGLE_API_KEY='your-key'"
-echo "2. Reload VS Code (Cmd/Ctrl+Shift+P → 'Developer: Reload Window')"
-echo "3. Start using @doc2mcp in Copilot Chat!"
-`
-      downloadFile(script, 'setup-doc2mcp.sh', 'text/plain')
-    }
-  }
-
-  const openVSCodeSettings = () => {
-    // VS Code URI to open settings
-    window.open('vscode://settings/github.copilot.chat.mcp.enabled', '_blank')
   }
 
   const getConfigPath = () => {
@@ -185,73 +146,120 @@ echo "3. Start using @doc2mcp in Copilot Chat!"
 
   return (
     <div className="space-y-6">
-      {/* Quick Setup Card */}
-      <Card className="border-primary/50 bg-gradient-to-br from-primary/5 to-primary/10">
+      {/* One-Click Install Card */}
+      <Card className="border-primary bg-gradient-to-br from-primary/10 to-primary/5 shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-primary" />
-            Quick Setup
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Sparkles className="h-6 w-6 text-primary" />
+            One-Click Install
           </CardTitle>
-          <CardDescription>
-            One-click setup options - choose your preferred method
+          <CardDescription className="text-base">
+            Add Doc2MCP to VS Code instantly - saves files directly to your project
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <Button 
-              onClick={downloadSetupScript}
-              className="h-auto py-4 flex-col gap-2"
-            >
-              <Terminal className="h-5 w-5" />
-              <span>Download Setup Script</span>
-              <span className="text-xs opacity-75">Run in your project folder</span>
-            </Button>
-            
-            <Button 
-              variant="secondary"
-              onClick={() => {
-                downloadMcpJson()
-                downloadToolsYaml()
-              }}
-              className="h-auto py-4 flex-col gap-2"
-            >
-              <Download className="h-5 w-5" />
-              <span>Download Config Files</span>
-              <span className="text-xs opacity-75">mcp.json + tools.yaml</span>
-            </Button>
+          <Button 
+            onClick={quickInstall}
+            disabled={installStatus === 'saving'}
+            size="lg"
+            className="w-full h-14 text-lg gap-3"
+          >
+            {installStatus === 'saving' ? (
+              <>
+                <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Saving...
+              </>
+            ) : installStatus === 'success' ? (
+              <>
+                <CheckCircle2 className="h-5 w-5" />
+                Installed!
+              </>
+            ) : (
+              <>
+                <Zap className="h-5 w-5" />
+                Add to VS Code
+              </>
+            )}
+          </Button>
 
-            <Button 
-              variant="outline"
-              onClick={openVSCodeSettings}
-              className="h-auto py-4 flex-col gap-2"
-            >
-              <ExternalLink className="h-5 w-5" />
-              <span>Open VS Code Settings</span>
-              <span className="text-xs opacity-75">Configure manually</span>
-            </Button>
-          </div>
+          {statusMessage && (
+            <div className={`p-3 rounded-lg text-sm ${
+              installStatus === 'success' 
+                ? 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20' 
+                : installStatus === 'error'
+                ? 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
+                : 'bg-muted text-muted-foreground'
+            }`}>
+              {statusMessage}
+            </div>
+          )}
 
-          <div className="bg-background/50 rounded-lg p-4 text-sm">
-            <p className="font-medium mb-2">🎯 Recommended: Use the Setup Script</p>
-            <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-              <li>Download the setup script</li>
-              <li>Run it in your project folder: <code className="bg-muted px-1 rounded">./setup-doc2mcp.sh</code></li>
-              <li>Set your API key: <code className="bg-muted px-1 rounded">export GOOGLE_API_KEY="..."</code></li>
-              <li>Reload VS Code and start using it!</li>
+          <div className="text-sm text-muted-foreground space-y-2">
+            <p className="font-medium">This will:</p>
+            <ol className="list-decimal list-inside space-y-1 ml-2">
+              <li>Save <code className="bg-muted px-1 rounded">mcp.json</code> → Choose your <code className="bg-muted px-1 rounded">.vscode/</code> folder</li>
+              <li>Save <code className="bg-muted px-1 rounded">tools.yaml</code> → Choose your project root</li>
             </ol>
           </div>
+
+          {installStatus === 'success' && (
+            <div className="bg-primary/10 rounded-lg p-4 space-y-3">
+              <p className="font-medium text-primary">🎉 Almost done! Just 2 more steps:</p>
+              <div className="text-sm space-y-3">
+                <div>
+                  <p className="mb-1">1. Install the package:</p>
+                  <div className="flex gap-2">
+                    <code className="bg-background px-3 py-2 rounded flex-1 font-mono">pip install doc2mcp</code>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleCopy('pip install doc2mcp', 'pip')}
+                    >
+                      {copied === 'pip' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <div>
+                  <p className="mb-1">2. Set your API key:</p>
+                  <div className="flex gap-2">
+                    <code className="bg-background px-3 py-2 rounded flex-1 font-mono text-xs">export GOOGLE_API_KEY="your-key"</code>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleCopy('export GOOGLE_API_KEY="your-key"', 'env')}
+                    >
+                      {copied === 'env' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <p className="text-muted-foreground">
+                  Then reload VS Code: <kbd className="px-2 py-0.5 bg-muted rounded border text-xs">Cmd/Ctrl+Shift+P</kbd> → "Reload Window"
+                </p>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Client Selector */}
+      {tools.length === 0 && (
+        <Card className="border-yellow-500/50 bg-yellow-500/5">
+          <CardContent className="pt-6">
+            <p className="text-sm text-muted-foreground">
+              ⚠️ You haven't created any tools yet. Add some tools first to generate a complete configuration.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Client Selector & Config Preview */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileJson className="h-5 w-5" />
-            MCP Configuration
+            Configuration Preview
           </CardTitle>
           <CardDescription>
-            Select your AI client to get the correct config format
+            View and download configuration files for different AI clients
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -285,14 +293,12 @@ echo "3. Start using @doc2mcp in Copilot Chat!"
           {/* JSON Config */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium">
-                {activeTab === 'vscode' ? 'mcp.json' : activeTab === 'cursor' ? 'mcp.json' : 'claude_desktop_config.json'}
-              </p>
+              <p className="text-sm font-medium">mcp.json</p>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={downloadMcpJson}
+                  onClick={() => downloadFile(JSON.stringify(config, null, 2), 'mcp.json')}
                   className="gap-1.5"
                 >
                   <Download className="h-3.5 w-3.5" />
@@ -313,124 +319,34 @@ echo "3. Start using @doc2mcp in Copilot Chat!"
               {JSON.stringify(config, null, 2)}
             </pre>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Tools YAML */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Tools Configuration</CardTitle>
-          <CardDescription>
-            Your documentation tools - place tools.yaml in your project root
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium">tools.yaml</p>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={downloadToolsYaml}
-                className="gap-1.5"
-              >
-                <Download className="h-3.5 w-3.5" />
-                Download
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleCopy(toolsYaml, 'yaml')}
-                className="gap-1.5"
-              >
-                {copied === 'yaml' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                {copied === 'yaml' ? 'Copied!' : 'Copy'}
-              </Button>
+          {/* Tools YAML */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium">tools.yaml</p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => downloadFile(toolsYaml, 'tools.yaml', 'text/yaml')}
+                  className="gap-1.5"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Download
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleCopy(toolsYaml, 'yaml')}
+                  className="gap-1.5"
+                >
+                  {copied === 'yaml' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copied === 'yaml' ? 'Copied!' : 'Copy'}
+                </Button>
+              </div>
             </div>
-          </div>
-          <pre className="bg-card border border-border rounded-lg p-4 text-sm overflow-x-auto max-h-96">
-            {toolsYaml}
-          </pre>
-        </CardContent>
-      </Card>
-
-      {tools.length === 0 && (
-        <Card className="border-yellow-500/50 bg-yellow-500/5">
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">
-              ⚠️ You haven't created any tools yet. Add some tools first to generate a complete configuration.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Manual Setup Instructions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Manual Setup Instructions</CardTitle>
-          <CardDescription>
-            Step-by-step guide if you prefer manual setup
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <p className="font-medium mb-2">1. Install Doc2MCP</p>
-            <div className="flex gap-2">
-              <pre className="bg-muted rounded-lg p-3 text-sm font-mono flex-1">
-                pip install doc2mcp
-              </pre>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => handleCopy('pip install doc2mcp', 'install')}
-              >
-                {copied === 'install' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <p className="font-medium mb-2">2. Create config files</p>
-            <p className="text-sm text-muted-foreground">
-              Download or copy the files above into your project:
-            </p>
-            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
-              <li><code className="bg-muted px-1 rounded">.vscode/mcp.json</code> - MCP server config</li>
-              <li><code className="bg-muted px-1 rounded">tools.yaml</code> - Your documentation tools</li>
-            </ul>
-          </div>
-
-          <div>
-            <p className="font-medium mb-2">3. Set up environment</p>
-            <div className="flex gap-2">
-              <pre className="bg-muted rounded-lg p-3 text-sm font-mono flex-1">
-                export GOOGLE_API_KEY="your-api-key"
-              </pre>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => handleCopy('export GOOGLE_API_KEY="your-api-key"', 'env')}
-              >
-                {copied === 'env' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <p className="font-medium mb-2">4. Reload VS Code</p>
-            <p className="text-sm text-muted-foreground">
-              Press <kbd className="px-2 py-0.5 bg-muted rounded border text-xs">Ctrl+Shift+P</kbd> (or <kbd className="px-2 py-0.5 bg-muted rounded border text-xs">Cmd+Shift+P</kbd> on Mac) 
-              and run "Developer: Reload Window"
-            </p>
-          </div>
-
-          <div>
-            <p className="font-medium mb-2">5. Start using it!</p>
-            <p className="text-sm text-muted-foreground">
-              Open GitHub Copilot Chat and try:
-            </p>
-            <pre className="bg-muted rounded-lg p-3 text-sm font-mono mt-2">
-              @doc2mcp search for authentication in Next.js docs
+            <pre className="bg-card border border-border rounded-lg p-4 text-sm overflow-x-auto max-h-64">
+              {toolsYaml}
             </pre>
           </div>
         </CardContent>
@@ -453,8 +369,8 @@ settings:
 `
   }
 
-  let yaml = `# tools.yaml - Generated from Doc2MCP Platform
-# Auto-generated configuration for your documentation tools
+  let yaml = `# tools.yaml - Generated from Doc2MCP Dashboard
+# Your documentation search tools
 
 tools:\n`
 

@@ -197,7 +197,6 @@ async def run_indexing_job(request: IndexRequest):
             except Exception as link_error:
                 logger.warning(f"Failed to index {link_url}: {link_error}")
         
-        await send_job_update(request.job_id, f"Indexing complete! Indexed {pages_indexed} pages, found {links_found} links.")
         job.progress = 100
         job.status = "completed"
         job.result = {
@@ -205,6 +204,8 @@ async def run_indexing_job(request: IndexRequest):
             "links_found": links_found,
             "url": request.url
         }
+        # Send final update AFTER setting completed status
+        await send_job_update(request.job_id, f"Indexing complete! Indexed {pages_indexed} pages, found {links_found} links.")
         
     except Exception as e:
         logger.error(f"Indexing job {request.job_id} failed: {e}")
@@ -245,7 +246,6 @@ async def run_search_job(request: SearchRequest):
             await send_job_update(request.job_id, "Synthesizing answer...")
             job.progress = 95
             
-            await send_job_update(request.job_id, "Search complete!")
             job.progress = 100
             job.status = "completed"
             job.result = {
@@ -254,6 +254,8 @@ async def run_search_job(request: SearchRequest):
                 "pages_explored": result.get("pages_explored", 0),
                 "tool": result.get("tool", {})
             }
+            # Send final update AFTER setting completed status
+            await send_job_update(request.job_id, "Search complete!")
         else:
             raise Exception("Agent not initialized")
         
