@@ -1,373 +1,187 @@
 # Doc2MCP
 
-An MCP (Model Context Protocol) server that automatically converts API documentation URLs into callable tools with Arize Phoenix observability. Built with TypeScript, the MCP SDK, OpenTelemetry tracing, and Zod schema validation.
+An MCP (Model Context Protocol) server that provides tool documentation to AI agents via intelligent search.
+
+When an agent needs documentation for a tool, it calls Doc2MCP with a search query and tool name. The server fetches documentation from configured sources (web or local files) and uses a background Gemini 2.5 Flash agent to extract the most relevant content.
 
 ## Features
 
-- 🔄 **Multi-Format Support**: Parses OpenAPI/Swagger, HTML, and Markdown documentation
-- 🛠️ **Automatic Tool Generation**: Creates callable MCP tools from API endpoints
-- 📊 **Arize Observability**: Full OpenTelemetry tracing with documentation lineage
-- ✅ **Schema Validation**: Generates Zod schemas for runtime type safety
-- 🎯 **Type-Safe**: Complete TypeScript implementation with strict typing
-- ⚡ **Production Ready**: Error handling, logging, and deployment configurations
-
-## Architecture
-
-Doc2MCP follows a 5-phase implementation:
-
-1. **Documentation Parsing**: Supports OpenAPI/Swagger (JSON/YAML), HTML, and Markdown
-2. **Tool Generation**: Generates Zod schemas and creates callable tools
-3. **Arize Integration**: OpenTelemetry tracing with source lineage tracking
-4. **MCP Server**: MCP SDK-based server with stdio transport
-5. **Testing & Deployment**: Comprehensive tests and deployment options
+- **MCP Server**: Standard MCP interface for easy integration with Claude, VS Code, and other MCP clients
+- **Multi-source Documentation**: Supports web scraping and local file sources
+- **Intelligent Search**: Uses Gemini 2.5 Flash to extract relevant documentation based on your query
+- **Arize Phoenix Integration**: Full LLM tracing for observability and debugging
+- **YAML Configuration**: Simple configuration file to register tools and their doc sources
 
 ## Installation
 
 ```bash
-npm install
-npm run build
+pip install doc2mcp
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/yourusername/doc2mcp.git
+cd doc2mcp
+pip install -e .
+```
+
+## Configuration
+
+### 1. Set up environment variables
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+cp .env.example .env
+```
+
+Required:
+- `GOOGLE_API_KEY`: Your Google API key for Gemini
+
+Optional (for cloud Phoenix):
+- `PHOENIX_API_KEY`: Arize Phoenix API key
+- `PHOENIX_COLLECTOR_ENDPOINT`: Phoenix endpoint URL
+
+### 2. Configure tools
+
+Edit `tools.yaml` to register tools and their documentation sources:
+
+```yaml
+tools:
+  anthropic:
+    name: "Anthropic Claude API"
+    description: "Claude AI assistant API documentation"
+    sources:
+      - type: web
+        url: "https://docs.anthropic.com/en/api"
+        selectors:
+          content: "main, article"
+          exclude: "nav, footer"
+
+  my_internal_tool:
+    name: "My Internal Tool"
+    description: "Internal tool documentation"
+    sources:
+      - type: local
+        path: "./docs/my_tool"
+        patterns:
+          - "*.md"
+          - "**/*.txt"
+
+settings:
+  max_content_length: 50000
+  cache_ttl: 3600
+  request_timeout: 30
 ```
 
 ## Usage
 
-### Running the Server
+### Running the server
 
 ```bash
-# Set documentation URLs
-export DOC_URLS="https://api.example.com/openapi.json,https://docs.example.com/api"
+# Run directly
+doc2mcp
 
-# Optional: Configure Arize Phoenix tracing
-export TRACING_ENABLED=true
-export ARIZE_ENDPOINT="http://localhost:6006/v1/traces"
-export ARIZE_API_KEY="your-api-key"
-
-# Start the server
-npm start
+# Or with Python
+python -m doc2mcp.server
 ```
 
-### Using with MCP Clients
+### Configuring MCP clients
 
-Add to your MCP client configuration (e.g., Claude Desktop):
+Add to your Claude Desktop config (`claude_desktop_config.json`):
 
 ```json
 {
   "mcpServers": {
     "doc2mcp": {
-      "command": "node",
-      "args": ["/path/to/doc2mcp/dist/index.js"],
+      "command": "doc2mcp",
       "env": {
-        "DOC_URLS": "https://petstore.swagger.io/v2/swagger.json",
-        "TRACING_ENABLED": "true"
+        "GOOGLE_API_KEY": "your-key-here"
       }
     }
   }
 }
 ```
 
-### Development Mode
-
-```bash
-npm run dev
-```
-
-## Supported Documentation Formats
-
-### OpenAPI/Swagger
-
-Supports OpenAPI 3.0+ and Swagger 2.0 specifications in JSON or YAML format:
-
-```yaml
-openapi: 3.0.0
-info:
-  title: Sample API
-  version: 1.0.0
-paths:
-  /users:
-    get:
-      summary: List users
-      parameters:
-        - name: limit
-          in: query
-          schema:
-            type: integer
-```
-
-### HTML Documentation
-
-Extracts API endpoints from HTML documentation:
-
-```html
-<h2>GET /api/users</h2>
-<p>Retrieves a list of users</p>
-<code>GET /api/users?limit=10</code>
-```
-
-### Markdown Documentation
-
-Parses API endpoints from Markdown files:
-
-```markdown
-## GET /api/users
-
-Retrieves a list of users.
-
-Parameters:
-- `limit` (number): Maximum number of users to return
-```
-
-## Observability
-
-Doc2MCP integrates with Arize Phoenix for comprehensive observability:
-
-### Tracing Features
-
-- **Tool Execution Spans**: Every tool call creates a span with full context
-- **Documentation Lineage**: Tracks which documentation generated each tool
-- **Error Tracking**: Automatic error recording and exception tracking
-- **Performance Metrics**: Request duration and success rates
-
-### Span Attributes
-
-Each tool execution includes:
-
-- `tool.name`: Generated tool name
-- `tool.source_url`: Original documentation URL
-- `tool.source_type`: Documentation format (openapi/html/markdown)
-- `tool.endpoint.path`: API endpoint path
-- `tool.endpoint.method`: HTTP method
-- `tool.args`: Input arguments
-- `tool.success`: Execution status
-- `http.status_code`: Response status code
-
-### Running Arize Phoenix
-
-```bash
-# Using Docker
-docker run -p 6006:6006 arizephoenix/phoenix:latest
-
-# Or install locally
-pip install arize-phoenix
-phoenix serve
-```
-
-Visit http://localhost:6006 to view traces.
-
-## Tool Generation
-
-Doc2MCP automatically generates tools with:
-
-### Zod Schema Validation
-
-```typescript
-// Generated schema for a user endpoint
-z.object({
-  userId: z.string().describe('User ID'),
-  limit: z.number().optional().describe('Results per page'),
-})
-```
-
-### Tool Metadata
-
-Each tool includes:
-- Name (auto-generated or from operationId)
-- Description (from documentation)
-- Input schema (JSON Schema from Zod)
-- Handler function (executes API call)
-- Metadata (source, endpoint, generation time)
-
-### Example Tool
-
-For an endpoint `GET /users/{userId}`:
+Or for VS Code, add to your settings:
 
 ```json
 {
-  "name": "getUsers",
-  "description": "Retrieves user information",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "userId": { "type": "string", "description": "User ID" }
-    },
-    "required": ["userId"]
+  "mcp.servers": {
+    "doc2mcp": {
+      "command": "doc2mcp"
+    }
   }
 }
 ```
 
-## Configuration
+### Available Tools
 
-### Environment Variables
+The MCP server exposes two tools:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DOC_URLS` | Comma-separated documentation URLs | `[]` |
-| `TRACING_ENABLED` | Enable OpenTelemetry tracing | `true` |
-| `ARIZE_ENDPOINT` | Arize Phoenix endpoint URL | `http://localhost:6006/v1/traces` |
-| `ARIZE_API_KEY` | Arize API key (if required) | - |
+#### `search_docs`
 
-## Error Handling
+Search documentation for a specific tool.
 
-Doc2MCP includes comprehensive error handling:
-
-- **Network Errors**: Timeouts, connection failures
-- **Parsing Errors**: Invalid documentation formats
-- **Validation Errors**: Schema validation failures
-- **API Errors**: HTTP errors from target APIs
-
-All errors are:
-- Logged to stderr
-- Tracked in OpenTelemetry spans
-- Returned as structured error responses
-
-## Project Structure
-
+```json
+{
+  "tool_name": "anthropic",
+  "query": "How do I use the messages API with streaming?"
+}
 ```
-doc2mcp/
-├── src/
-│   ├── parsers/           # Documentation parsers
-│   │   ├── openapi-parser.ts
-│   │   ├── html-parser.ts
-│   │   ├── markdown-parser.ts
-│   │   └── index.ts
-│   ├── generators/        # Tool and schema generators
-│   │   ├── schema-generator.ts
-│   │   └── tool-generator.ts
-│   ├── observability/     # OpenTelemetry integration
-│   │   └── tracing.ts
-│   ├── server/           # MCP server implementation
-│   │   └── index.ts
-│   ├── types/            # TypeScript type definitions
-│   │   └── index.ts
-│   ├── utils/            # Utility functions
-│   │   └── helpers.ts
-│   └── index.ts          # Main entry point
-├── dist/                 # Compiled JavaScript
-├── package.json
-├── tsconfig.json
-└── README.md
+
+#### `list_available_tools`
+
+List all tools with available documentation.
+
+```json
+{}
 ```
+
+## Observability with Arize Phoenix
+
+Doc2MCP integrates with Arize Phoenix for full LLM tracing. This lets you:
+
+- See exactly which documentation sources were used
+- Track token usage and latency
+- Debug unexpected responses
+- Audit the search agent's reasoning
+
+### Local Phoenix
+
+By default, Doc2MCP starts a local Phoenix instance. Access the UI at `http://localhost:6006` after starting the server.
+
+### Cloud Phoenix
+
+To use Arize's hosted Phoenix:
+
+1. Get an API key from [Arize](https://arize.com)
+2. Set environment variables:
+   ```bash
+   export PHOENIX_API_KEY=your-key
+   export PHOENIX_COLLECTOR_ENDPOINT=https://app.phoenix.arize.com
+   ```
 
 ## Development
 
-### Building
-
 ```bash
-npm run build
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Format code
+ruff format .
+
+# Lint
+ruff check .
+
+# Type check
+mypy doc2mcp
 ```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-### Formatting
-
-```bash
-npm run format
-```
-
-### Testing
-
-```bash
-npm test
-```
-
-## Deployment Options
-
-### Docker
-
-```dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --production
-COPY dist ./dist
-CMD ["node", "dist/index.js"]
-```
-
-### systemd Service
-
-```ini
-[Unit]
-Description=Doc2MCP Server
-After=network.target
-
-[Service]
-Type=simple
-User=doc2mcp
-WorkingDirectory=/opt/doc2mcp
-ExecStart=/usr/bin/node /opt/doc2mcp/dist/index.js
-Environment="DOC_URLS=https://api.example.com/openapi.json"
-Environment="TRACING_ENABLED=true"
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-```
-
-### PM2
-
-```bash
-pm2 start dist/index.js --name doc2mcp
-```
-
-## Examples
-
-### Petstore API
-
-```bash
-export DOC_URLS="https://petstore.swagger.io/v2/swagger.json"
-npm start
-```
-
-Generated tools:
-- `getPetById` - Find pet by ID
-- `addPet` - Add a new pet
-- `updatePet` - Update an existing pet
-- `deletePet` - Deletes a pet
-
-### GitHub API
-
-```bash
-export DOC_URLS="https://api.github.com/openapi.json"
-npm start
-```
-
-### Multiple APIs
-
-```bash
-export DOC_URLS="https://api1.example.com/openapi.json,https://api2.example.com/docs"
-npm start
-```
-
-## Limitations
-
-- HTML/Markdown parsing is heuristic-based and may not capture all endpoints
-- Authentication/authorization must be handled by the API itself or via headers
-- Large documentation files may take time to parse
-- Some complex OpenAPI features (allOf, oneOf, etc.) use simplified schemas
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
 
 ## License
 
-MIT
-
-## Support
-
-For issues and feature requests, please use the GitHub issue tracker.
-
-## Acknowledgments
-
-- Built with [MCP SDK](https://github.com/modelcontextprotocol/sdk)
-- Observability by [Arize Phoenix](https://phoenix.arize.com/)
-- Schema validation with [Zod](https://zod.dev/)
-- OpenAPI parsing with [yaml](https://www.npmjs.com/package/yaml)
-- HTML parsing with [cheerio](https://cheerio.js.org/)
-- Markdown parsing with [marked](https://marked.js.org/)
+MIT License - see [LICENSE](LICENSE) for details.
