@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Activity, CheckCircle2, XCircle, Clock, Loader2, Eye } from 'lucide-react'
+import { Activity, CheckCircle2, XCircle, Clock, Loader2, Eye, Trash2, RefreshCw } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 
 interface Job {
@@ -24,6 +24,8 @@ export function JobsList({ jobs: initialJobs }: { jobs: Job[] }) {
   const [jobs, setJobs] = useState(initialJobs)
   const [selectedJob, setSelectedJob] = useState<Job | null>(null)
   const [ws, setWs] = useState<WebSocket | null>(null)
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
     // Poll for job updates
@@ -41,6 +43,80 @@ export function JobsList({ jobs: initialJobs }: { jobs: Job[] }) {
 
     return () => clearInterval(interval)
   }, [])
+
+  const refreshJobs = async () => {
+    setIsRefreshing(true)
+    try {
+      const res = await fetch('/api/jobs')
+      if (res.ok) {
+        const updated = await res.json()
+        setJobs(updated)
+      }
+    } catch (error) {
+      console.error('Failed to refresh jobs:', error)
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
+
+  const deleteJob = async (jobId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    
+    if (!confirm('Are you sure you want to delete this job?')) {
+      return
+    }
+
+    setDeletingIds(prev => new Set(prev).add(jobId))
+    
+    try {
+      const res = await fetch(`/api/jobs/${jobId}`, {
+        method: 'DELETE',
+      })
+      
+      if (res.ok) {
+        setJobs(prev => prev.filter(job => job.id !== jobId))
+        if (selectedJob?.id === jobId) {
+          setSelectedJob(null)
+          ws?.close()
+          setWs(null)
+        }
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Failed to delete job')
+      }
+    } catch (error) {
+      console.error('Failed to delete job:', error)
+      alert('Failed to delete job')
+    } finally {
+      setDeletingIds(prev => {
+        const next = new Set(prev)
+        next.delete(jobId)
+        return next
+      })
+    }
+  }
+
+  const deleteAllCompleted = async () => {
+    const completedJobs = jobs.filter(j => j.status === 'completed' || j.status === 'failed')
+    if (completedJobs.length === 0) {
+      alert('No completed or failed jobs to delete')
+      return
+    }
+    
+    if (!confirm(`Delete ${completedJobs.length} completed/failed job(s)?`)) {
+      return
+    }
+
+    for (const job of completedJobs) {
+      try {
+        await fetch(`/api/jobs/${job.id}`, { method: 'DELETE' })
+      } catch (error) {
+        console.error('Failed to delete job:', job.id, error)
+      }
+    }
+    
+    await refreshJobs()
+  }
 
   const connectWebSocket = (jobId: string) => {
     const wsUrl = `ws://localhost:8000/ws/jobs/${jobId}`
@@ -95,8 +171,53 @@ export function JobsList({ jobs: initialJobs }: { jobs: Job[] }) {
     )
   }
 
+  const runningCount = jobs.filter(j => j.status === 'running').length
+  const completedCount = jobs.filter(j => j.status === 'completed').length
+  const failedCount = jobs.filter(j => j.status === 'failed').length
+
   return (
     <>
+      {/* Stats and Actions Bar */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-4 text-sm">
+          <span className="flex items-center gap-1.5">
+            <Loader2 className="h-4 w-4 text-primary" />
+            <span className="text-muted-foreground">{runningCount} running</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <span className="text-muted-foreground">{completedCount} completed</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <XCircle className="h-4 w-4 text-red-500" />
+            <span className="text-muted-foreground">{failedCount} failed</span>
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshJobs}
+            disabled={isRefreshing}
+            className="gap-1.5"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          {(completedCount > 0 || failedCount > 0) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={deleteAllCompleted}
+              className="gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Clear Done
+            </Button>
+          )}
+        </div>
+      </div>
+
       <div className="space-y-3">
         {jobs.map((job) => {
           const input = JSON.parse(job.input)
@@ -150,6 +271,20 @@ export function JobsList({ jobs: initialJobs }: { jobs: Job[] }) {
                   >
                     <Eye className="h-3.5 w-3.5" />
                     Details
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => deleteJob(job.id, e)}
+                    disabled={deletingIds.has(job.id) || job.status === 'running'}
+                    className="gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    title={job.status === 'running' ? 'Cannot delete running job' : 'Delete job'}
+                  >
+                    {deletingIds.has(job.id) ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-3.5 w-3.5" />
+                    )}
                   </Button>
                 </div>
               </CardContent>
