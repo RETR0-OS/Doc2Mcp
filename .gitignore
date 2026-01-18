@@ -66,3 +66,6 @@ temp/
 # Arize Phoenix
 phoenix_data/
 .arize/
+
+# Doc2MCP cache
+doc_cache.json

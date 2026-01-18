@@ -1,6 +1,7 @@
 """Arize Phoenix tracing setup for observability."""
 
 import os
+from pathlib import Path
 from typing import Any
 
 from opentelemetry import trace
@@ -9,6 +10,9 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
 # Global tracer instance
 _tracer: trace.Tracer | None = None
+
+# Default Phoenix data directory (stable path, not temp)
+DEFAULT_PHOENIX_DIR = Path("./phoenix_data")
 
 
 def init_tracing(service_name: str = "doc2mcp") -> trace.Tracer:
@@ -54,8 +58,15 @@ def init_tracing(service_name: str = "doc2mcp") -> trace.Tracer:
             headers={"api_key": phoenix_api_key},
         )
     else:
-        # Start local Phoenix instance
-        px.launch_app()
+        # Start local Phoenix instance with stable storage path
+        phoenix_dir = Path(os.environ.get("PHOENIX_WORKING_DIR", str(DEFAULT_PHOENIX_DIR)))
+        phoenix_dir.mkdir(parents=True, exist_ok=True)
+
+        # Set env var for Phoenix to use (it reads PHOENIX_WORKING_DIR)
+        os.environ["PHOENIX_WORKING_DIR"] = str(phoenix_dir.absolute())
+
+        # use_temp_dir=False makes Phoenix use PHOENIX_WORKING_DIR for SQLite storage
+        px.launch_app(use_temp_dir=False)
         tracer_provider = register(project_name=service_name)
 
     _tracer = trace.get_tracer(service_name)

@@ -112,6 +112,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         tool_info = result.get("tool", {})
         sources = result.get("sources", [])
         content = result.get("content", "No content found.")
+        pages_explored = result.get("pages_explored", 0)
 
         response_text = f"""# Documentation: {tool_info.get('name', tool_name)}
 
@@ -123,6 +124,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
 ---
 **Sources:** {', '.join(sources)}
+**Pages explored:** {pages_explored}
 """
         return [TextContent(type="text", text=response_text)]
 

@@ -1,30 +1,45 @@
-"""Background agent for intelligent documentation search."""
+"""Deep research agent for intelligent documentation search."""
 
+import json
 import os
 from typing import Any
+from urllib.parse import urlparse
 
 import google.generativeai as genai
 from opentelemetry import trace
 
+from doc2mcp.cache import PageCache
 from doc2mcp.config import Config, LocalSource, ToolConfig, WebSource
 from doc2mcp.fetchers.local import LocalFetcher
-from doc2mcp.fetchers.web import WebFetcher
+from doc2mcp.fetchers.web import FetchResult, WebFetcher
 from doc2mcp.tracing.phoenix import trace_doc_retrieval, trace_llm_call
+
+# Default max pages to explore per query
+DEFAULT_MAX_PAGES = 10
 
 
 class DocSearchAgent:
-    """Agent that searches documentation using Gemini for intelligent extraction.
+    """Deep research agent that iteratively explores documentation.
 
     This agent:
-    1. Fetches raw documentation from configured sources (web/local)
-    2. Uses Gemini to extract the most relevant parts based on the query
-    3. Returns structured, relevant documentation to the caller
+    1. Starts from configured source URLs
+    2. Fetches pages and caches them with descriptive summaries
+    3. Uses Gemini to decide which links to follow based on the query
+    4. Continues until it finds sufficient information or hits limits
+    5. Returns the most relevant documentation
     """
 
-    def __init__(self, config: Config) -> None:
+    def __init__(
+        self,
+        config: Config,
+        cache_path: str = "./doc_cache.json",
+        max_pages: int = DEFAULT_MAX_PAGES,
+    ) -> None:
         self.config = config
+        self.max_pages = max_pages
         self.web_fetcher = WebFetcher(timeout=config.settings.request_timeout)
         self.local_fetcher = LocalFetcher()
+        self.cache = PageCache(cache_path)
 
         # Initialize Gemini client
         api_key = os.environ.get("GOOGLE_API_KEY")
@@ -32,26 +47,61 @@ class DocSearchAgent:
             raise ValueError("GOOGLE_API_KEY environment variable is required")
 
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash",
-            system_instruction=self._get_system_prompt(),
+
+        # Model for navigation decisions (fast, cheap)
+        self.nav_model = genai.GenerativeModel(
+            model_name="gemini-2.0-flash",
+            system_instruction=self._get_navigation_prompt(),
         )
+
+        # Model for final answer synthesis
+        self.synthesis_model = genai.GenerativeModel(
+            model_name="gemini-2.0-flash",
+            system_instruction=self._get_synthesis_prompt(),
+        )
+
         self.tracer = trace.get_tracer("doc2mcp.agent")
 
-    def _get_system_prompt(self) -> str:
-        """Get the system prompt for the documentation search agent."""
+    def _get_navigation_prompt(self) -> str:
+        """System prompt for navigation decisions."""
+        return """You are a documentation research assistant. Your job is to analyze documentation pages and decide how to navigate to find relevant information.
+
+You will be given:
+1. A user's query about what they need to find
+2. Content from the current page
+3. Links available on the page
+
+You must respond with a JSON object containing:
+{
+    "has_sufficient_info": boolean,  // true if current content fully answers the query
+    "relevant_content": string,      // extract of relevant content found (if any)
+    "summary": string,               // brief summary of this page (for caching)
+    "links_to_explore": [            // links worth exploring (max 3, most promising first)
+        {"url": "...", "reason": "..."}
+    ]
+}
+
+Guidelines:
+- Be conservative with "has_sufficient_info" - only true if the query is fully answered
+- Extract ONLY directly relevant content, not the whole page
+- Prioritize links that seem most likely to contain the answer
+- If the page is not relevant at all, return empty relevant_content and suggest better links
+- Focus on official documentation, API references, and getting-started guides"""
+
+    def _get_synthesis_prompt(self) -> str:
+        """System prompt for final answer synthesis."""
         return """You are a documentation search assistant. Your job is to:
-1. Read the provided documentation
-2. Extract and return ONLY the parts that are relevant to the user's query
+1. Read the provided documentation excerpts from multiple sources
+2. Synthesize a comprehensive answer to the user's query
 3. Preserve code examples, API signatures, and technical details
 4. Format the output clearly with proper markdown
-5. Include source references when available
+5. Include source references
 
-If the documentation doesn't contain relevant information, say so clearly.
+If the documentation doesn't fully answer the query, say what's missing.
 Do NOT make up information - only use what's in the provided documentation."""
 
     async def search(self, tool_name: str, query: str) -> dict[str, Any]:
-        """Search for documentation relevant to the query.
+        """Search for documentation using deep exploration.
 
         Args:
             tool_name: Name of the tool to search documentation for.
@@ -62,6 +112,7 @@ Do NOT make up information - only use what's in the provided documentation."""
                 - content: The relevant documentation text
                 - sources: List of source URLs/paths used
                 - tool: Tool name and description
+                - pages_explored: Number of pages explored
         """
         with self.tracer.start_as_current_span("doc_search") as span:
             span.set_attribute("tool_name", tool_name)
@@ -78,121 +129,300 @@ Do NOT make up information - only use what's in the provided documentation."""
                     "sources": [],
                 }
 
-            # Fetch all documentation
-            raw_docs, sources = await self._fetch_all_docs(tool_config)
-
-            if not raw_docs:
-                return {
-                    "error": "No documentation could be fetched",
-                    "content": None,
-                    "sources": sources,
-                    "tool": {
-                        "name": tool_config.name,
-                        "description": tool_config.description,
-                    },
-                }
-
-            # Use Gemini to extract relevant information
-            relevant_content = await self._extract_relevant_content(
-                query=query,
-                tool_name=tool_config.name,
-                raw_docs=raw_docs,
-            )
-
-            # Truncate if needed
-            max_len = self.config.settings.max_content_length
-            if len(relevant_content) > max_len:
-                relevant_content = relevant_content[:max_len] + "\n\n[Content truncated...]"
+            # Perform deep search
+            result = await self._deep_search(query, tool_config)
 
             # Trace the retrieval
             trace_doc_retrieval(
                 tool_name=tool_name,
                 query=query,
-                sources=sources,
-                content_length=len(relevant_content),
+                sources=result["sources"],
+                content_length=len(result["content"]) if result["content"] else 0,
             )
 
             return {
-                "content": relevant_content,
-                "sources": sources,
+                **result,
                 "tool": {
                     "name": tool_config.name,
                     "description": tool_config.description,
                 },
             }
 
-    async def _fetch_all_docs(
+    async def _deep_search(
+        self, query: str, tool_config: ToolConfig
+    ) -> dict[str, Any]:
+        """Perform deep iterative search through documentation.
+
+        Args:
+            query: The user's search query.
+            tool_config: Configuration for the tool.
+
+        Returns:
+            Dictionary with content, sources, and exploration stats.
+        """
+        # Collect relevant content from exploration
+        collected_content: list[dict[str, str]] = []  # [{"url": ..., "content": ...}]
+        visited_urls: set[str] = set()
+        sources: list[str] = []
+
+        # Queue of URLs to explore: (url, priority)
+        to_explore: list[tuple[str, int]] = []
+
+        # Get starting URLs and domain restrictions
+        start_urls, domains = self._get_starting_points(tool_config)
+
+        # Check cache for similar content first
+        for domain in domains:
+            cached = self.cache.find_similar(query, domain)
+            for page in cached[:3]:  # Use top 3 cached matches
+                if page["url"] not in visited_urls:
+                    collected_content.append({
+                        "url": page["url"],
+                        "content": page["content"][:5000],  # Limit cached content
+                    })
+                    visited_urls.add(page["url"])
+                    sources.append(f"[cached] {page['url']}")
+
+        # Add starting URLs to queue
+        for url in start_urls:
+            if url not in visited_urls:
+                to_explore.append((url, 0))
+
+        # Exploration loop
+        pages_explored = 0
+        has_sufficient = False
+
+        while to_explore and pages_explored < self.max_pages and not has_sufficient:
+            # Get next URL (sort by priority, lower is better)
+            to_explore.sort(key=lambda x: x[1])
+            current_url, _ = to_explore.pop(0)
+
+            if current_url in visited_urls:
+                continue
+
+            visited_urls.add(current_url)
+            pages_explored += 1
+
+            # Check cache first
+            cached_page = self.cache.get(current_url)
+
+            if cached_page:
+                # Use cached content
+                fetch_result = FetchResult(
+                    url=cached_page["url"],
+                    content=cached_page["content"],
+                    title=cached_page["title"],
+                    links=cached_page["links"],
+                )
+            else:
+                # Fetch the page
+                try:
+                    base_domain = domains[0] if domains else None
+                    fetch_result = await self.web_fetcher.fetch_with_links(
+                        current_url, base_domain
+                    )
+                except Exception as e:
+                    # Skip failed fetches
+                    continue
+
+            # Ask LLM to analyze the page
+            nav_result = await self._analyze_page(query, fetch_result)
+
+            # Cache the page with summary
+            if not cached_page and fetch_result.content:
+                self.cache.put(
+                    url=fetch_result.url,
+                    title=fetch_result.title,
+                    summary=nav_result.get("summary", ""),
+                    content=fetch_result.content,
+                    links=fetch_result.links,
+                    domain=domains[0] if domains else urlparse(current_url).netloc,
+                )
+
+            # Collect relevant content
+            if nav_result.get("relevant_content"):
+                collected_content.append({
+                    "url": current_url,
+                    "content": nav_result["relevant_content"],
+                })
+                sources.append(current_url)
+
+            # Check if we have enough
+            if nav_result.get("has_sufficient_info"):
+                has_sufficient = True
+                break
+
+            # Add recommended links to queue
+            for i, link in enumerate(nav_result.get("links_to_explore", [])):
+                link_url = link.get("url", "")
+                if link_url and link_url not in visited_urls:
+                    # Priority based on position in recommendations
+                    to_explore.append((link_url, pages_explored * 10 + i))
+
+        # Handle local sources (not part of deep search)
+        local_content = await self._fetch_local_sources(tool_config)
+        if local_content:
+            collected_content.append({
+                "url": "[local]",
+                "content": local_content,
+            })
+            sources.append("[local sources]")
+
+        # Synthesize final answer
+        if not collected_content:
+            return {
+                "content": "No relevant documentation found.",
+                "sources": sources,
+                "pages_explored": pages_explored,
+            }
+
+        final_content = await self._synthesize_answer(query, collected_content)
+
+        # Truncate if needed
+        max_len = self.config.settings.max_content_length
+        if len(final_content) > max_len:
+            final_content = final_content[:max_len] + "\n\n[Content truncated...]"
+
+        return {
+            "content": final_content,
+            "sources": sources,
+            "pages_explored": pages_explored,
+        }
+
+    def _get_starting_points(
         self, tool_config: ToolConfig
-    ) -> tuple[str, list[str]]:
-        """Fetch documentation from all configured sources.
+    ) -> tuple[list[str], list[str]]:
+        """Extract starting URLs and domains from tool config.
 
         Args:
             tool_config: Configuration for the tool.
 
         Returns:
-            Tuple of (combined documentation text, list of source URLs/paths).
+            Tuple of (list of starting URLs, list of allowed domains).
         """
-        docs_parts: list[str] = []
-        sources: list[str] = []
+        urls = []
+        domains = []
 
         for source in tool_config.sources:
-            try:
-                if isinstance(source, WebSource):
-                    content = await self.web_fetcher.fetch(source)
-                    source_id = source.url
-                elif isinstance(source, LocalSource):
-                    content = await self.local_fetcher.fetch(source)
-                    source_id = source.path
-                else:
-                    continue
+            if isinstance(source, WebSource):
+                urls.append(source.url)
+                parsed = urlparse(source.url)
+                if parsed.netloc and parsed.netloc not in domains:
+                    domains.append(parsed.netloc)
 
-                if content:
-                    docs_parts.append(f"## Source: {source_id}\n\n{content}")
-                    sources.append(source_id)
+        return urls, domains
 
-            except Exception as e:
-                # Log but continue with other sources
-                sources.append(f"{source.type}:error:{e!s}")
-
-        return "\n\n---\n\n".join(docs_parts), sources
-
-    async def _extract_relevant_content(
-        self,
-        query: str,
-        tool_name: str,
-        raw_docs: str,
-    ) -> str:
-        """Use Gemini to extract relevant content from documentation.
+    async def _analyze_page(
+        self, query: str, fetch_result: FetchResult
+    ) -> dict[str, Any]:
+        """Use LLM to analyze a page and decide next steps.
 
         Args:
             query: The user's search query.
-            tool_name: Name of the tool.
-            raw_docs: Raw combined documentation.
+            fetch_result: The fetched page content and links.
 
         Returns:
-            Extracted relevant content.
+            Navigation decision with relevant content and links to explore.
         """
-        # Truncate raw docs if too long for context
-        # Gemini 2.5 Flash has 1M token context, but we limit for efficiency
-        max_input = 500000
-        if len(raw_docs) > max_input:
-            raw_docs = raw_docs[:max_input] + "\n\n[Documentation truncated for processing...]"
+        # Truncate content for analysis
+        content = fetch_result.content[:50000]
 
-        user_message = f"""I need documentation about: {query}
+        # Format links for the prompt
+        links_text = "\n".join(
+            f"- [{link['text']}]({link['url']})"
+            for link in fetch_result.links[:50]  # Limit links shown
+        )
 
-Tool: {tool_name}
+        prompt = f"""Query: {query}
 
-Here is the raw documentation to search through:
+Current page: {fetch_result.url}
+Title: {fetch_result.title}
 
-{raw_docs}
+Page content:
+{content}
 
-Please extract and return the relevant documentation for my query. Include code examples if available."""
+Available links on this page:
+{links_text}
 
-        with self.tracer.start_as_current_span("gemini_extraction") as span:
-            span.set_attribute("query", query)
+Analyze this page and respond with a JSON object."""
 
-            response = await self.model.generate_content_async(
-                user_message,
+        with self.tracer.start_as_current_span("nav_decision") as span:
+            span.set_attribute("url", fetch_result.url)
+
+            try:
+                response = await self.nav_model.generate_content_async(
+                    prompt,
+                    generation_config=genai.GenerationConfig(
+                        max_output_tokens=4096,
+                        temperature=0.1,
+                        response_mime_type="application/json",
+                    ),
+                )
+
+                result_text = response.text
+
+                # Trace the call
+                trace_llm_call(
+                    model="gemini-2.0-flash",
+                    messages=[{"role": "user", "content": prompt[:500]}],
+                    response=result_text[:500],
+                    tokens_in=getattr(
+                        getattr(response, "usage_metadata", None),
+                        "prompt_token_count",
+                        None,
+                    ),
+                    tokens_out=getattr(
+                        getattr(response, "usage_metadata", None),
+                        "candidates_token_count",
+                        None,
+                    ),
+                )
+
+                return json.loads(result_text)
+
+            except (json.JSONDecodeError, Exception) as e:
+                # Return safe default on error
+                return {
+                    "has_sufficient_info": False,
+                    "relevant_content": "",
+                    "summary": fetch_result.title,
+                    "links_to_explore": [],
+                }
+
+    async def _synthesize_answer(
+        self, query: str, collected_content: list[dict[str, str]]
+    ) -> str:
+        """Synthesize final answer from collected content.
+
+        Args:
+            query: The user's search query.
+            collected_content: List of content excerpts from explored pages.
+
+        Returns:
+            Synthesized documentation answer.
+        """
+        # Format collected content
+        content_parts = []
+        for item in collected_content:
+            content_parts.append(f"## Source: {item['url']}\n\n{item['content']}")
+
+        combined = "\n\n---\n\n".join(content_parts)
+
+        # Truncate if needed
+        if len(combined) > 100000:
+            combined = combined[:100000] + "\n\n[Content truncated...]"
+
+        prompt = f"""Query: {query}
+
+Documentation excerpts found:
+
+{combined}
+
+Please synthesize a comprehensive answer to the query using the documentation above. Include code examples if available."""
+
+        with self.tracer.start_as_current_span("synthesis") as span:
+            response = await self.synthesis_model.generate_content_async(
+                prompt,
                 generation_config=genai.GenerationConfig(
                     max_output_tokens=8192,
                     temperature=0.1,
@@ -201,23 +431,43 @@ Please extract and return the relevant documentation for my query. Include code 
 
             result = response.text
 
-            # Get token counts if available
-            tokens_in = None
-            tokens_out = None
-            if hasattr(response, "usage_metadata"):
-                tokens_in = getattr(response.usage_metadata, "prompt_token_count", None)
-                tokens_out = getattr(response.usage_metadata, "candidates_token_count", None)
-
-            # Trace the LLM call
             trace_llm_call(
-                model="gemini-2.5-flash",
-                messages=[{"role": "user", "content": user_message[:500]}],
-                response=result,
-                tokens_in=tokens_in,
-                tokens_out=tokens_out,
+                model="gemini-2.0-flash",
+                messages=[{"role": "user", "content": prompt[:500]}],
+                response=result[:500],
+                tokens_in=getattr(
+                    getattr(response, "usage_metadata", None),
+                    "prompt_token_count",
+                    None,
+                ),
+                tokens_out=getattr(
+                    getattr(response, "usage_metadata", None),
+                    "candidates_token_count",
+                    None,
+                ),
             )
 
             return result
+
+    async def _fetch_local_sources(self, tool_config: ToolConfig) -> str:
+        """Fetch content from local sources.
+
+        Args:
+            tool_config: Configuration for the tool.
+
+        Returns:
+            Combined local documentation content.
+        """
+        parts = []
+        for source in tool_config.sources:
+            if isinstance(source, LocalSource):
+                try:
+                    content = await self.local_fetcher.fetch(source)
+                    if content:
+                        parts.append(content)
+                except Exception:
+                    pass
+        return "\n\n".join(parts)
 
     async def list_tools(self) -> list[dict[str, str]]:
         """List all available tools.

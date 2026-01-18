@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "mcp__doc2mcp__list_available_tools",
-      "mcp__doc2mcp__search_docs"
+      "mcp__doc2mcp__search_docs",
+      "WebSearch"
     ]
   },
   "enabledMcpjsonServers": [
