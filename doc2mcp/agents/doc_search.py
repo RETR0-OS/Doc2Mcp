@@ -14,6 +14,7 @@ from doc2mcp.compression import ContentCompressor
 from doc2mcp.config import Config, LocalSource, ToolConfig, WebSource
 from doc2mcp.fetchers.local import LocalFetcher
 from doc2mcp.fetchers.web import FetchResult, WebFetcher
+from doc2mcp.sitemap_index import SitemapIndex
 from doc2mcp.tracing.phoenix import trace_doc_retrieval, trace_llm_call
 
 # Default max pages to explore per query
@@ -35,6 +36,7 @@ class DocSearchAgent:
         self,
         config: Config,
         cache_path: str = "./doc_cache.json",
+        sitemap_index_path: str = "./sitemap_index.json",
         max_pages: int = DEFAULT_MAX_PAGES,
     ) -> None:
         self.config = config
@@ -42,6 +44,16 @@ class DocSearchAgent:
         self.web_fetcher = WebFetcher(timeout=config.settings.request_timeout)
         self.local_fetcher = LocalFetcher()
         self.cache = PageCache(cache_path)
+
+        # Initialize sitemap index for faster URL lookup
+        sitemap_settings = config.settings.sitemap_index
+        self.sitemap_index = SitemapIndex(
+            index_path=sitemap_index_path,
+            ttl=sitemap_settings.ttl,
+            max_urls_per_domain=sitemap_settings.max_urls_per_domain,
+            parallel_fetch_limit=sitemap_settings.parallel_fetch_limit,
+        )
+        self.sitemap_enabled = sitemap_settings.enabled
 
         # Initialize content compressor for token optimization
         compression_settings = config.settings.compression
@@ -159,6 +171,9 @@ Do NOT make up information - only use what's in the provided documentation."""
     ) -> dict[str, Any]:
         """Perform deep iterative search through documentation.
 
+        Uses sitemap index for fast URL lookup when available,
+        falling back to full exploration if no good matches found.
+
         Args:
             query: The user's search query.
             tool_config: Configuration for the tool.
@@ -189,10 +204,23 @@ Do NOT make up information - only use what's in the provided documentation."""
                     visited_urls.add(page["url"])
                     sources.append(f"[cached] {page['url']}")
 
-        # Add starting URLs to queue
+        # Try to get candidate URLs from sitemap index (fast path)
+        sitemap_candidates = await self._get_sitemap_candidates(query, tool_config)
+
+        if sitemap_candidates:
+            # Use sitemap candidates as starting points with high priority
+            for url, score in sitemap_candidates:
+                if url not in visited_urls:
+                    # Lower priority number = higher priority (explored first)
+                    # High-scoring matches get priority 0-4, lower scores get 5-9
+                    priority = max(0, min(9, int(10 - score)))
+                    to_explore.append((url, priority))
+                    sources.append(f"[sitemap-match] {url}")
+
+        # Add original starting URLs as fallback (lower priority)
         for url in start_urls:
             if url not in visited_urls:
-                to_explore.append((url, 0))
+                to_explore.append((url, 10))  # Lower priority than sitemap matches
 
         # Exploration loop
         pages_explored = 0
@@ -275,11 +303,15 @@ Do NOT make up information - only use what's in the provided documentation."""
             sources.append("[local sources]")
 
         # Synthesize final answer
+        sitemap_used = len(sitemap_candidates) > 0
+
         if not collected_content:
             return {
                 "content": "No relevant documentation found.",
                 "sources": sources,
                 "pages_explored": pages_explored,
+                "sitemap_used": sitemap_used,
+                "sitemap_candidates": len(sitemap_candidates),
             }
 
         final_content = await self._synthesize_answer(query, collected_content)
@@ -293,6 +325,8 @@ Do NOT make up information - only use what's in the provided documentation."""
             "content": final_content,
             "sources": sources,
             "pages_explored": pages_explored,
+            "sitemap_used": sitemap_used,
+            "sitemap_candidates": len(sitemap_candidates),
         }
 
     def _get_starting_points(
@@ -317,6 +351,54 @@ Do NOT make up information - only use what's in the provided documentation."""
                     domains.append(parsed.netloc)
 
         return urls, domains
+
+    async def _get_sitemap_candidates(
+        self, query: str, tool_config: ToolConfig
+    ) -> list[tuple[str, float]]:
+        """Get candidate URLs from sitemap index based on query.
+
+        Args:
+            query: The search query.
+            tool_config: Configuration for the tool.
+
+        Returns:
+            List of (url, score) tuples for relevant URLs.
+        """
+        if not self.sitemap_enabled:
+            return []
+
+        sitemap_settings = self.config.settings.sitemap_index
+        candidates: list[tuple[str, float]] = []
+
+        for source in tool_config.sources:
+            if not isinstance(source, WebSource):
+                continue
+
+            parsed = urlparse(source.url)
+            domain = parsed.netloc
+
+            # Ensure domain is indexed (lazy indexing)
+            try:
+                await self.sitemap_index.ensure_indexed(domain, source.url)
+            except Exception:
+                # Skip if indexing fails - will fall back to normal search
+                continue
+
+            # Find relevant URLs from index
+            matches = self.sitemap_index.find_relevant_urls(
+                query=query,
+                domain=domain,
+                max_results=sitemap_settings.max_url_candidates,
+            )
+
+            # Filter by minimum score
+            for match in matches:
+                if match.score >= sitemap_settings.min_match_score:
+                    candidates.append((match.url, match.score))
+
+        # Sort by score descending
+        candidates.sort(key=lambda x: x[1], reverse=True)
+        return candidates[:sitemap_settings.max_url_candidates]
 
     async def _analyze_page(
         self, query: str, fetch_result: FetchResult

@@ -14,6 +14,8 @@ class WebSource(BaseModel):
     type: Literal["web"] = "web"
     url: str
     selectors: dict[str, str] | None = None
+    sitemap_url: str | None = None  # Optional explicit sitemap URL
+    index_depth: int = Field(default=3, ge=1, le=10)  # Crawl depth if no sitemap
 
 
 class LocalSource(BaseModel):
@@ -63,6 +65,43 @@ class CompressionSettings(BaseModel):
     )
 
 
+class SitemapIndexSettings(BaseModel):
+    """Settings for sitemap-based URL indexing."""
+
+    enabled: bool = Field(
+        default=True,
+        description="Enable sitemap indexing for faster URL lookup.",
+    )
+    ttl: int = Field(
+        default=86400,
+        ge=0,
+        description="Time-to-live for sitemap index in seconds (default: 24 hours).",
+    )
+    max_urls_per_domain: int = Field(
+        default=1000,
+        ge=100,
+        le=10000,
+        description="Maximum URLs to index per domain.",
+    )
+    parallel_fetch_limit: int = Field(
+        default=10,
+        ge=1,
+        le=50,
+        description="Maximum concurrent fetches during crawling.",
+    )
+    min_match_score: float = Field(
+        default=1.0,
+        ge=0.0,
+        description="Minimum score for URL matches to be considered relevant.",
+    )
+    max_url_candidates: int = Field(
+        default=5,
+        ge=1,
+        le=20,
+        description="Maximum URL candidates to fetch directly from sitemap index.",
+    )
+
+
 class Settings(BaseModel):
     """Global settings for Doc2MCP."""
 
@@ -70,6 +109,7 @@ class Settings(BaseModel):
     cache_ttl: int = 3600
     request_timeout: int = 30
     compression: CompressionSettings = Field(default_factory=CompressionSettings)
+    sitemap_index: SitemapIndexSettings = Field(default_factory=SitemapIndexSettings)
 
 
 class Config(BaseModel):

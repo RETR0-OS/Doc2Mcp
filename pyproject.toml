@@ -36,6 +36,8 @@ dependencies = [
     "google-genai>=0.2.0",
     "python-dotenv>=1.0.0",
     "tokenc>=0.1.2",
+    "opentelemetry-distro>=0.60b1",
+    "pytest>=9.0.2",
 ]
 
 [project.optional-dependencies]
