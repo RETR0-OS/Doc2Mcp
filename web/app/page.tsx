@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Zap, Database, Eye, Terminal } from 'lucide-react'
+import { AuthNav, HeroAuthButtons, CTAAuthButtons } from '@/components/AuthNav'
+import { Zap, Database, Eye, Terminal } from 'lucide-react'
 
 export default function HomePage() {
   return (
@@ -15,20 +15,7 @@ export default function HomePage() {
           </div>
           
           <nav className="flex items-center gap-4">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <Button variant="ghost">Sign In</Button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <Button>Get Started</Button>
-              </SignUpButton>
-            </SignedOut>
-            <SignedIn>
-              <Link href="/dashboard">
-                <Button variant="ghost">Dashboard</Button>
-              </Link>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
+            <AuthNav />
           </nav>
         </div>
       </header>
@@ -53,20 +40,7 @@ export default function HomePage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <SignedOut>
-              <SignUpButton mode="modal">
-                <Button size="lg" className="gap-2">
-                  Start Building <ArrowRight className="h-4 w-4" />
-                </Button>
-              </SignUpButton>
-            </SignedOut>
-            <SignedIn>
-              <Link href="/dashboard">
-                <Button size="lg" className="gap-2">
-                  Go to Dashboard <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            </SignedIn>
+            <HeroAuthButtons />
             <Button size="lg" variant="outline" asChild>
               <a href="https://github.com/RETR0-OS/Doc2Mcp" target="_blank" rel="noopener noreferrer">
                 View on GitHub
@@ -146,20 +120,7 @@ export default function HomePage() {
           <p className="text-lg text-muted-foreground mb-8">
             Join developers building smarter documentation experiences
           </p>
-          <SignedOut>
-            <SignUpButton mode="modal">
-              <Button size="lg" className="gap-2">
-                Get Started Free <ArrowRight className="h-4 w-4" />
-              </Button>
-            </SignUpButton>
-          </SignedOut>
-          <SignedIn>
-            <Link href="/dashboard">
-              <Button size="lg" className="gap-2">
-                Go to Dashboard <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </SignedIn>
+          <CTAAuthButtons />
         </div>
       </section>
 

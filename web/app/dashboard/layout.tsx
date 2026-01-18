@@ -1,5 +1,4 @@
 import { currentUser } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 
 export default async function DashboardLayout({
@@ -9,8 +8,9 @@ export default async function DashboardLayout({
 }) {
   const user = await currentUser()
 
+  // Middleware handles the redirect, this is just a safety check
   if (!user) {
-    redirect('/')
+    return null
   }
 
   // Serialize only the needed user data for client component

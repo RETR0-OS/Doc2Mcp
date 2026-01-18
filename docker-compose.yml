@@ -13,7 +13,7 @@ services:
       - API_URL=http://api:8000
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
     env_file:
-      - ./web/.env
+      - ./web/.env.local
     volumes:
       - ./web/data:/app/data
     depends_on:

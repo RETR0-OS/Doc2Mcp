@@ -3,7 +3,7 @@ FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
@@ -19,6 +19,10 @@ RUN if [ -f package-lock.json ]; then \
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
+
+# Install OpenSSL for Prisma (needed during prisma generate)
+RUN apk add --no-cache openssl
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -34,7 +38,7 @@ WORKDIR /app
 
 ENV NODE_ENV production
 
-# Install OpenSSL for Prisma
+# Install OpenSSL for Prisma runtime
 RUN apk add --no-cache openssl
 
 RUN addgroup --system --gid 1001 nodejs
