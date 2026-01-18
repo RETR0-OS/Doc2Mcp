@@ -30,8 +30,8 @@ app.add_middleware(
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize doc2mcp components
-config = Config(tools={}, settings=Config.Settings())
+# Initialize doc2mcp components (use default empty config)
+config = Config()
 agent: Optional[DocSearchAgent] = None
 cache = PageCache("./doc_cache.json")
 web_fetcher = WebFetcher()
