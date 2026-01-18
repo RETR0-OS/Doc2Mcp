@@ -310,7 +310,7 @@ sudo cp -r dist package*.json /opt/doc2mcp/
 cd /opt/doc2mcp && sudo npm ci --production
 
 # 3. Create service file at /etc/systemd/system/doc2mcp.service
-# (See DEPLOYMENT.md for complete service configuration)
+# (See DEPLOYMENT.md for complete service configuration with non-root user)
 
 # 4. Start service
 sudo systemctl enable doc2mcp
