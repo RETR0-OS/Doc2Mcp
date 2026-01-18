@@ -1,6 +1,6 @@
 # Doc2MCP
 
-An MCP (Model Context Protocol) server that automatically converts API documentation URLs into callable tools with Arize Phoenix observability. Built with TypeScript, LeanMCP, OpenTelemetry tracing, and Zod schema validation.
+An MCP (Model Context Protocol) server that automatically converts API documentation URLs into callable tools with Arize Phoenix observability. Built with TypeScript, the MCP SDK, OpenTelemetry tracing, and Zod schema validation.
 
 ## Features
 
@@ -18,7 +18,7 @@ Doc2MCP follows a 5-phase implementation:
 1. **Documentation Parsing**: Supports OpenAPI/Swagger (JSON/YAML), HTML, and Markdown
 2. **Tool Generation**: Generates Zod schemas and creates callable tools
 3. **Arize Integration**: OpenTelemetry tracing with source lineage tracking
-4. **MCP Server**: LeanMCP-based server with stdio transport
+4. **MCP Server**: MCP SDK-based server with stdio transport
 5. **Testing & Deployment**: Comprehensive tests and deployment options
 
 ## Installation

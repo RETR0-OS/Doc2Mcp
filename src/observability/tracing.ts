@@ -30,7 +30,7 @@ export class TracingManager {
    */
   initialize() {
     if (!this.config.enabled) {
-      console.log('Tracing is disabled');
+      console.error('Tracing is disabled');
       return;
     }
 
@@ -61,7 +61,7 @@ export class TracingManager {
     this.provider.addSpanProcessor(new BatchSpanProcessor(exporter));
     this.provider.register();
 
-    console.log(`Tracing initialized with endpoint: ${endpoint}`);
+    console.error(`Tracing initialized with endpoint: ${endpoint}`);
   }
 
   /**
@@ -70,7 +70,7 @@ export class TracingManager {
   async shutdown() {
     if (this.provider) {
       await this.provider.shutdown();
-      console.log('Tracing shut down');
+      console.error('Tracing shut down');
     }
   }
 

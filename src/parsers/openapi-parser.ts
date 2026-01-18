@@ -62,6 +62,25 @@ export class OpenAPIParser {
           isOpenAPI3
         );
 
+        // Handle OpenAPI 3.0 request body separately
+        if (isOpenAPI3 && operation.requestBody) {
+          const requestBody = operation.requestBody;
+          const content = requestBody.content || {};
+          const jsonContent = content['application/json'] || Object.values(content)[0];
+
+          if (jsonContent) {
+            parameters.push({
+              name: 'body',
+              in: 'body',
+              description: requestBody.description,
+              required: requestBody.required || false,
+              type: 'object',
+              schema: jsonContent.schema,
+              example: jsonContent.example,
+            });
+          }
+        }
+
         const responses = this.parseResponses(operation.responses || {});
 
         endpoints.push({
@@ -97,24 +116,17 @@ export class OpenAPIParser {
     const parameters: APIParameter[] = [];
 
     for (const param of allParams) {
-      // Handle OpenAPI 3.0 request body
-      if (param.in === 'body' || param.requestBody) {
-        const bodyParam = param.requestBody || param;
-        const content = bodyParam.content || {};
-        const jsonContent = content['application/json'] || Object.values(content)[0];
-
-        if (jsonContent) {
-          parameters.push({
-            name: param.name || 'body',
-            in: 'body',
-            description: bodyParam.description || param.description,
-            required: param.required || bodyParam.required || false,
-            type: 'object',
-            schema: jsonContent.schema || param.schema,
-            example: jsonContent.example,
-          });
-        }
-      } else {
+      // Handle Swagger 2.0 body parameter
+      if (!isOpenAPI3 && param.in === 'body') {
+        parameters.push({
+          name: param.name || 'body',
+          in: 'body',
+          description: param.description,
+          required: param.required || false,
+          type: 'object',
+          schema: param.schema,
+        });
+      } else if (param.in) {
         // Regular parameter (query, path, header)
         const schema = isOpenAPI3 ? param.schema : param;
         parameters.push({
