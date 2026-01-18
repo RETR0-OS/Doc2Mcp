@@ -40,7 +40,7 @@ export function ToolForm({ initialData }: { initialData?: any }) {
   const removeSource = (index: number) => {
     setFormData({
       ...formData,
-      sources: formData.sources.filter((_, i) => i !== index),
+      sources: formData.sources.filter((_: any, i: number) => i !== index),
     })
   }
 
@@ -137,7 +137,7 @@ export function ToolForm({ initialData }: { initialData?: any }) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {formData.sources.map((source, index) => (
+          {formData.sources.map((source: Source, index: number) => (
             <div key={index} className="p-4 border border-border rounded-lg space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
