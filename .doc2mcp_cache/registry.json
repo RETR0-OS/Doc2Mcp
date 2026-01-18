@@ -1,6 +1,662 @@
 {
   "tools": [
     {
+      "tool_id": "babylon_setup",
+      "name": "Setup",
+      "description": "Documentation: Setup. Topics: setup",
+      "url": "https://doc.babylonjs.com/setup",
+      "keywords": [
+        "setup"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_legacy",
+      "name": "Legacy",
+      "description": "Documentation: Legacy. Topics: legacy",
+      "url": "https://doc.babylonjs.com/legacy",
+      "keywords": [
+        "legacy"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_journey",
+      "name": "Journey",
+      "description": "Documentation: Journey. Topics: journey",
+      "url": "https://doc.babylonjs.com/journey",
+      "keywords": [
+        "journey"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_features",
+      "name": "Features",
+      "description": "Documentation: Features. Topics: features",
+      "url": "https://doc.babylonjs.com/features",
+      "keywords": [
+        "features"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_whats_new",
+      "name": "Whats New",
+      "description": "Documentation: Whats New. Topics: whats, new",
+      "url": "https://doc.babylonjs.com/whats-new",
+      "keywords": [
+        "whats",
+        "new"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_contribute",
+      "name": "Contribute",
+      "description": "Documentation: Contribute. Topics: contribute",
+      "url": "https://doc.babylonjs.com/contribute",
+      "keywords": [
+        "contribute"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_journey_forum",
+      "name": "Forum",
+      "description": "Documentation: Forum. Topics: journey, forum",
+      "url": "https://doc.babylonjs.com/journey/forum",
+      "keywords": [
+        "journey",
+        "forum"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_setup_support",
+      "name": "Support",
+      "description": "Documentation: Support. Topics: setup, support",
+      "url": "https://doc.babylonjs.com/setup/support",
+      "keywords": [
+        "setup",
+        "support"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_dlearning",
+      "name": "Guidedlearning",
+      "description": "Documentation: Guidedlearning. Topics: guided, learning",
+      "url": "https://doc.babylonjs.com/guidedLearning",
+      "keywords": [
+        "guided",
+        "learning"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_legacy_physics",
+      "name": "Physics",
+      "description": "Documentation: Physics. Topics: legacy, physics",
+      "url": "https://doc.babylonjs.com/legacy/physics",
+      "keywords": [
+        "legacy",
+        "physics"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_setup_templates",
+      "name": "Templates",
+      "description": "Documentation: Templates. Topics: setup, templates",
+      "url": "https://doc.babylonjs.com/setup/templates",
+      "keywords": [
+        "setup",
+        "templates"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_babyloncrossplat",
+      "name": "Babyloncrossplat",
+      "description": "Documentation: Babyloncrossplat. Topics: babylon, cross, plat",
+      "url": "https://doc.babylonjs.com/BabylonCrossPlat",
+      "keywords": [
+        "babylon",
+        "cross",
+        "plat"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_breaking_changes",
+      "name": "Breaking Changes",
+      "description": "Documentation: Breaking Changes. Topics: breaking, changes",
+      "url": "https://doc.babylonjs.com/breaking-changes",
+      "keywords": [
+        "breaking",
+        "changes"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_setup_starterhtml",
+      "name": "Starterhtml",
+      "description": "Documentation: Starterhtml. Topics: setup, starter, html",
+      "url": "https://doc.babylonjs.com/setup/starterHTML",
+      "keywords": [
+        "setup",
+        "starter",
+        "html"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_toolsandresources",
+      "name": "Toolsandresources",
+      "description": "Documentation: Toolsandresources. Topics: tools, and, resources",
+      "url": "https://doc.babylonjs.com/toolsAndResources",
+      "keywords": [
+        "tools",
+        "and",
+        "resources"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_communityextensions",
+      "name": "Communityextensions",
+      "description": "Documentation: Communityextensions. Topics: community, extensions",
+      "url": "https://doc.babylonjs.com/communityExtensions",
+      "keywords": [
+        "community",
+        "extensions"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_classes_gpu",
+      "name": "Gpu",
+      "description": "Documentation: Gpu. Topics: typedoc, classes, gpu",
+      "url": "https://doc.babylonjs.com/typedoc/classes/GPU",
+      "keywords": [
+        "typedoc",
+        "classes",
+        "gpu"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_types_xreye",
+      "name": "Xreye",
+      "description": "Documentation: Xreye. Topics: typedoc, types, xr, eye",
+      "url": "https://doc.babylonjs.com/typedoc/types/XREye",
+      "keywords": [
+        "typedoc",
+        "types",
+        "xr",
+        "eye"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_contribute_tobabylon",
+      "name": "Tobabylon",
+      "description": "Documentation: Tobabylon. Topics: contribute, to, babylon",
+      "url": "https://doc.babylonjs.com/contribute/toBabylon",
+      "keywords": [
+        "contribute",
+        "to",
+        "babylon"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_journey_thefirststep",
+      "name": "Thefirststep",
+      "description": "Documentation: Thefirststep. Topics: journey, the, first, step",
+      "url": "https://doc.babylonjs.com/journey/theFirstStep",
+      "keywords": [
+        "journey",
+        "the",
+        "first",
+        "step"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_setup_support_vscode",
+      "name": "Vscode",
+      "description": "Documentation: Vscode. Topics: setup, support, vs, code",
+      "url": "https://doc.babylonjs.com/setup/support/vsCode",
+      "keywords": [
+        "setup",
+        "support",
+        "vs",
+        "code"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_setup_support_webgl2",
+      "name": "Webgl2",
+      "description": "Documentation: Webgl2. Topics: setup, support, web",
+      "url": "https://doc.babylonjs.com/setup/support/webGL2",
+      "keywords": [
+        "setup",
+        "support",
+        "web"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_setup_support_webgpu",
+      "name": "Webgpu",
+      "description": "Documentation: Webgpu. Topics: setup, support, web, gpu",
+      "url": "https://doc.babylonjs.com/setup/support/webGPU",
+      "keywords": [
+        "setup",
+        "support",
+        "web",
+        "gpu"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_dlearning_videos",
+      "name": "Videos",
+      "description": "Documentation: Videos. Topics: guided, learning, videos",
+      "url": "https://doc.babylonjs.com/guidedLearning/videos",
+      "keywords": [
+        "guided",
+        "learning",
+        "videos"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_legacy_physics_forces",
+      "name": "Forces",
+      "description": "Documentation: Forces. Topics: legacy, physics, forces",
+      "url": "https://doc.babylonjs.com/legacy/physics/forces",
+      "keywords": [
+        "legacy",
+        "physics",
+        "forces"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_legacy_physics_joints",
+      "name": "Joints",
+      "description": "Documentation: Joints. Topics: legacy, physics, joints",
+      "url": "https://doc.babylonjs.com/legacy/physics/joints",
+      "keywords": [
+        "legacy",
+        "physics",
+        "joints"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_setup_templates_repos",
+      "name": "Repos",
+      "description": "Documentation: Repos. Topics: setup, templates, repos",
+      "url": "https://doc.babylonjs.com/setup/templates/repos",
+      "keywords": [
+        "setup",
+        "templates",
+        "repos"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_toolsandresources_nge",
+      "name": "Nge",
+      "description": "Documentation: Nge. Topics: tools, and, resources, nge",
+      "url": "https://doc.babylonjs.com/toolsAndResources/nge",
+      "keywords": [
+        "tools",
+        "and",
+        "resources",
+        "nge"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_toolsandresources_nme",
+      "name": "Nme",
+      "description": "Documentation: Nme. Topics: tools, and, resources, nme",
+      "url": "https://doc.babylonjs.com/toolsAndResources/nme",
+      "keywords": [
+        "tools",
+        "and",
+        "resources",
+        "nme"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_classes_xrray",
+      "name": "Xrray",
+      "description": "Documentation: Xrray. Topics: typedoc, classes, xr, ray",
+      "url": "https://doc.babylonjs.com/typedoc/classes/XRRay",
+      "keywords": [
+        "typedoc",
+        "classes",
+        "xr",
+        "ray"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_dlearning_bjsbook",
+      "name": "Bjsbook",
+      "description": "Documentation: Bjsbook. Topics: guided, learning, bjs, book",
+      "url": "https://doc.babylonjs.com/guidedLearning/bjsBook",
+      "keywords": [
+        "guided",
+        "learning",
+        "bjs",
+        "book"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_dlearning_offsite",
+      "name": "Offsite",
+      "description": "Documentation: Offsite. Topics: guided, learning, offsite",
+      "url": "https://doc.babylonjs.com/guidedLearning/offsite",
+      "keywords": [
+        "guided",
+        "learning",
+        "offsite"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_preparingartforbabylon",
+      "name": "Preparingartforbabylon",
+      "description": "Documentation: Preparingartforbabylon. Topics: preparing, art, for, babylon",
+      "url": "https://doc.babylonjs.com/preparingArtForBabylon",
+      "keywords": [
+        "preparing",
+        "art",
+        "for",
+        "babylon"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_classes_xrhand",
+      "name": "Xrhand",
+      "description": "Documentation: Xrhand. Topics: typedoc, classes, xr, hand",
+      "url": "https://doc.babylonjs.com/typedoc/classes/XRHand",
+      "keywords": [
+        "typedoc",
+        "classes",
+        "xr",
+        "hand"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_classes_xrpose",
+      "name": "Xrpose",
+      "description": "Documentation: Xrpose. Topics: typedoc, classes, xr, pose",
+      "url": "https://doc.babylonjs.com/typedoc/classes/XRPose",
+      "keywords": [
+        "typedoc",
+        "classes",
+        "xr",
+        "pose"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_classes_xrview",
+      "name": "Xrview",
+      "description": "Documentation: Xrview. Topics: typedoc, classes, xr, view",
+      "url": "https://doc.babylonjs.com/typedoc/classes/XRView",
+      "keywords": [
+        "typedoc",
+        "classes",
+        "xr",
+        "view"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_types_gpucolor",
+      "name": "Gpucolor",
+      "description": "Documentation: Gpucolor. Topics: typedoc, types, gpu, color",
+      "url": "https://doc.babylonjs.com/typedoc/types/GPUColor",
+      "keywords": [
+        "typedoc",
+        "types",
+        "gpu",
+        "color"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_dlearning_workshop",
+      "name": "Workshop",
+      "description": "Documentation: Workshop. Topics: guided, learning, workshop",
+      "url": "https://doc.babylonjs.com/guidedLearning/workshop",
+      "keywords": [
+        "guided",
+        "learning",
+        "workshop"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_journey_learningthedocs",
+      "name": "Learningthedocs",
+      "description": "Documentation: Learningthedocs. Topics: journey, learning, the, docs",
+      "url": "https://doc.babylonjs.com/journey/learningTheDocs",
+      "keywords": [
+        "journey",
+        "learning",
+        "the",
+        "docs"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_setup_frameworkpackages",
+      "name": "Frameworkpackages",
+      "description": "Documentation: Frameworkpackages. Topics: setup, framework, packages",
+      "url": "https://doc.babylonjs.com/setup/frameworkPackages",
+      "keywords": [
+        "setup",
+        "framework",
+        "packages"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_setup_support_workloads",
+      "name": "Workloads",
+      "description": "Documentation: Workloads. Topics: setup, support, workloads",
+      "url": "https://doc.babylonjs.com/setup/support/workloads",
+      "keywords": [
+        "setup",
+        "support",
+        "workloads"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_classes_xrframe",
+      "name": "Xrframe",
+      "description": "Documentation: Xrframe. Topics: typedoc, classes, xr, frame",
+      "url": "https://doc.babylonjs.com/typedoc/classes/XRFrame",
+      "keywords": [
+        "typedoc",
+        "classes",
+        "xr",
+        "frame"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_classes_xrlayer",
+      "name": "Xrlayer",
+      "description": "Documentation: Xrlayer. Topics: typedoc, classes, xr, layer",
+      "url": "https://doc.babylonjs.com/typedoc/classes/XRLayer",
+      "keywords": [
+        "typedoc",
+        "classes",
+        "xr",
+        "layer"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_classes_xrplane",
+      "name": "Xrplane",
+      "description": "Documentation: Xrplane. Topics: typedoc, classes, xr, plane",
+      "url": "https://doc.babylonjs.com/typedoc/classes/XRPlane",
+      "keywords": [
+        "typedoc",
+        "classes",
+        "xr",
+        "plane"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_classes_xrspace",
+      "name": "Xrspace",
+      "description": "Documentation: Xrspace. Topics: typedoc, classes, xr, space",
+      "url": "https://doc.babylonjs.com/typedoc/classes/XRSpace",
+      "keywords": [
+        "typedoc",
+        "classes",
+        "xr",
+        "space"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_modules_babylon",
+      "name": "Babylon",
+      "description": "Documentation: Babylon. Topics: typedoc, modules, babylon",
+      "url": "https://doc.babylonjs.com/typedoc/modules/BABYLON",
+      "keywords": [
+        "typedoc",
+        "modules",
+        "babylon"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_types_gpuloadop",
+      "name": "Gpuloadop",
+      "description": "Documentation: Gpuloadop. Topics: typedoc, types, gpu, load, op",
+      "url": "https://doc.babylonjs.com/typedoc/types/GPULoadOp",
+      "keywords": [
+        "typedoc",
+        "types",
+        "gpu",
+        "load",
+        "op"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_types_gpusize32",
+      "name": "Gpusize32",
+      "description": "Documentation: Gpusize32. Topics: typedoc, types, gpu, size",
+      "url": "https://doc.babylonjs.com/typedoc/types/GPUSize32",
+      "keywords": [
+        "typedoc",
+        "types",
+        "gpu",
+        "size"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_types_gpusize64",
+      "name": "Gpusize64",
+      "description": "Documentation: Gpusize64. Topics: typedoc, types, gpu, size",
+      "url": "https://doc.babylonjs.com/typedoc/types/GPUSize64",
+      "keywords": [
+        "typedoc",
+        "types",
+        "gpu",
+        "size"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
+      "tool_id": "babylon_typedoc_types_xrmeshset",
+      "name": "Xrmeshset",
+      "description": "Documentation: Xrmeshset. Topics: typedoc, types, xr, mesh, set",
+      "url": "https://doc.babylonjs.com/typedoc/types/XRMeshSet",
+      "keywords": [
+        "typedoc",
+        "types",
+        "xr",
+        "mesh",
+        "set"
+      ],
+      "parent_source": "babylon",
+      "content": null
+    },
+    {
       "tool_id": "anthropic_login",
       "name": "Claude Developer Platform",
       "description": "Documentation: Claude Developer Platform. Topics: login",
@@ -12,12 +668,24 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_dashboard",
+      "tool_id": "anthropic_usage",
       "name": "Claude Developer Platform",
-      "description": "Documentation: Claude Developer Platform. Topics: dashboard",
-      "url": "https://platform.claude.com/dashboard",
+      "description": "Documentation: Claude Developer Platform. Topics: usage",
+      "url": "https://platform.claude.com/usage",
       "keywords": [
-        "dashboard"
+        "usage"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_llms_txt",
+      "name": "Llms",
+      "description": "Documentation: Llms. Topics: llms, txt",
+      "url": "https://platform.claude.com/llms.txt",
+      "keywords": [
+        "llms",
+        "txt"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -43,31 +711,6 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_workbench_new",
-      "name": "Claude Developer Platform",
-      "description": "Documentation: Claude Developer Platform. Topics: workbench, new",
-      "url": "https://platform.claude.com/workbench/new",
-      "keywords": [
-        "workbench",
-        "new"
-      ],
-      "parent_source": "anthropic",
-      "content": null
-    },
-    {
-      "tool_id": "anthropic_llms_full_txt",
-      "name": "Reset Active Directory password\\",
-      "description": "Documentation: Reset Active Directory password\\. Topics: llms, full, txt",
-      "url": "https://platform.claude.com/llms-full.txt",
-      "keywords": [
-        "llms",
-        "full",
-        "txt"
-      ],
-      "parent_source": "anthropic",
-      "content": null
-    },
-    {
       "tool_id": "anthropic_settings_keys",
       "name": "Claude Developer Platform",
       "description": "Documentation: Claude Developer Platform. Topics: settings, keys",
@@ -80,13 +723,24 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_settings_profile",
+      "tool_id": "anthropic_en_intro",
+      "name": "Intro to Claude",
+      "description": "Documentation: Intro to Claude. Topics: intro",
+      "url": "https://platform.claude.com/docs/en/intro",
+      "keywords": [
+        "intro"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_settings_limits",
       "name": "Claude Developer Platform",
-      "description": "Documentation: Claude Developer Platform. Topics: settings, profile",
-      "url": "https://platform.claude.com/settings/profile",
+      "description": "Documentation: Claude Developer Platform. Topics: settings, limits",
+      "url": "https://platform.claude.com/settings/limits",
       "keywords": [
         "settings",
-        "profile"
+        "limits"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -103,48 +757,37 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_settings_members",
-      "name": "Claude Developer Platform",
-      "description": "Documentation: Claude Developer Platform. Topics: settings, members",
-      "url": "https://platform.claude.com/settings/members",
+      "tool_id": "anthropic_en_get_started",
+      "name": "Get started with Claude",
+      "description": "Documentation: Get started with Claude. Topics: get, started",
+      "url": "https://platform.claude.com/docs/en/get-started",
       "keywords": [
-        "settings",
-        "members"
+        "get",
+        "started"
       ],
       "parent_source": "anthropic",
       "content": null
     },
     {
-      "tool_id": "anthropic_settings_privacy",
+      "tool_id": "anthropic_settings_admin_keys",
       "name": "Claude Developer Platform",
-      "description": "Documentation: Claude Developer Platform. Topics: settings, privacy",
-      "url": "https://platform.claude.com/settings/privacy",
+      "description": "Documentation: Claude Developer Platform. Topics: settings, admin, keys",
+      "url": "https://platform.claude.com/settings/admin-keys",
       "keywords": [
         "settings",
-        "privacy"
+        "admin",
+        "keys"
       ],
       "parent_source": "anthropic",
       "content": null
     },
     {
-      "tool_id": "anthropic_en_api_errors",
-      "name": "Errors",
-      "description": "Documentation: Errors. Topics: errors",
-      "url": "https://platform.claude.com/docs/en/api/errors",
+      "tool_id": "anthropic_en_api_shared",
+      "name": "API Reference",
+      "description": "Documentation: API Reference. Topics: shared",
+      "url": "https://platform.claude.com/docs/en/api/$shared",
       "keywords": [
-        "errors"
-      ],
-      "parent_source": "anthropic",
-      "content": null
-    },
-    {
-      "tool_id": "anthropic_settings_workspaces",
-      "name": "Claude Developer Platform",
-      "description": "Documentation: Claude Developer Platform. Topics: settings, workspaces",
-      "url": "https://platform.claude.com/settings/workspaces",
-      "keywords": [
-        "settings",
-        "workspaces"
+        "shared"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -162,36 +805,52 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_en_api_versioning",
-      "name": "Versions",
-      "description": "Documentation: Versions. Topics: versioning",
-      "url": "https://platform.claude.com/docs/en/api/versioning",
+      "tool_id": "anthropic_en_api_openai_sdk",
+      "name": "OpenAI SDK compatibility",
+      "description": "Documentation: OpenAI SDK compatibility. Topics: openai, sdk",
+      "url": "https://platform.claude.com/docs/en/api/openai-sdk",
       "keywords": [
-        "versioning"
+        "openai",
+        "sdk"
       ],
       "parent_source": "anthropic",
       "content": null
     },
     {
-      "tool_id": "anthropic_en_api_client_sdks",
-      "name": "Client SDKs",
-      "description": "Documentation: Client SDKs. Topics: client, sdks",
-      "url": "https://platform.claude.com/docs/en/api/client-sdks",
+      "tool_id": "anthropic_en_agent_sdk_hooks",
+      "name": "Intercept and control agent behavior with hooks",
+      "description": "Documentation: Intercept and control agent behavior with hooks. Topics: agent, sdk, hooks",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/hooks",
       "keywords": [
-        "client",
-        "sdks"
+        "agent",
+        "sdk",
+        "hooks"
       ],
       "parent_source": "anthropic",
       "content": null
     },
     {
-      "tool_id": "anthropic_en_api_beta_headers",
-      "name": "Beta headers",
-      "description": "Documentation: Beta headers. Topics: beta, headers",
-      "url": "https://platform.claude.com/docs/en/api/beta-headers",
+      "tool_id": "anthropic_workspaces_default_logs",
+      "name": "Claude Developer Platform",
+      "description": "Documentation: Claude Developer Platform. Topics: workspaces, default, logs",
+      "url": "https://platform.claude.com/workspaces/default/logs",
       "keywords": [
-        "beta",
-        "headers"
+        "workspaces",
+        "default",
+        "logs"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_python",
+      "name": "Agent SDK reference",
+      "description": "Documentation: Agent SDK reference. Topics: agent, sdk, python",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/python",
+      "keywords": [
+        "agent",
+        "sdk",
+        "python"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -204,19 +863,6 @@
       "keywords": [
         "ip",
         "addresses"
-      ],
-      "parent_source": "anthropic",
-      "content": null
-    },
-    {
-      "tool_id": "anthropic_en_agent_sdk_skills",
-      "name": "Agent Skills in the SDK",
-      "description": "Documentation: Agent Skills in the SDK. Topics: agent, sdk, skills",
-      "url": "https://platform.claude.com/docs/en/agent-sdk/skills",
-      "keywords": [
-        "agent",
-        "sdk",
-        "skills"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -248,25 +894,25 @@
       "content": null
     },
     {
+      "tool_id": "anthropic_en_agent_sdk_sessions",
+      "name": "Session Management",
+      "description": "Documentation: Session Management. Topics: agent, sdk, sessions",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/sessions",
+      "keywords": [
+        "agent",
+        "sdk",
+        "sessions"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
       "tool_id": "anthropic_en_resources_overview",
       "name": "Documentation",
       "description": "Documentation: Documentation. Topics: resources, overview",
       "url": "https://platform.claude.com/docs/en/resources/overview",
       "keywords": [
         "resources",
-        "overview"
-      ],
-      "parent_source": "anthropic",
-      "content": null
-    },
-    {
-      "tool_id": "anthropic_en_agent_sdk_overview",
-      "name": "Agent SDK overview",
-      "description": "Documentation: Agent SDK overview. Topics: agent, sdk, overview",
-      "url": "https://platform.claude.com/docs/en/agent-sdk/overview",
-      "keywords": [
-        "agent",
-        "sdk",
         "overview"
       ],
       "parent_source": "anthropic",
@@ -286,6 +932,45 @@
       "content": null
     },
     {
+      "tool_id": "anthropic_en_agent_sdk_subagents",
+      "name": "Subagents in the SDK",
+      "description": "Documentation: Subagents in the SDK. Topics: agent, sdk, subagents",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/subagents",
+      "keywords": [
+        "agent",
+        "sdk",
+        "subagents"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_typescript",
+      "name": "Agent SDK reference",
+      "description": "Documentation: Agent SDK reference. Topics: agent, sdk, typescript",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/typescript",
+      "keywords": [
+        "agent",
+        "sdk",
+        "typescript"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_about_claude_pricing",
+      "name": "Pricing",
+      "description": "Documentation: Pricing. Topics: about, claude, pricing",
+      "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "keywords": [
+        "about",
+        "claude",
+        "pricing"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
       "tool_id": "anthropic_en_agent_sdk_quickstart",
       "name": "Quickstart",
       "description": "Documentation: Quickstart. Topics: agent, sdk, quickstart",
@@ -294,6 +979,31 @@
         "agent",
         "sdk",
         "quickstart"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_docs_models_overview",
+      "name": "Not Found",
+      "description": "Documentation: Not Found. Topics: models, overview",
+      "url": "https://platform.claude.com/docs/en/docs/models-overview",
+      "keywords": [
+        "models",
+        "overview"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_beta_models_list",
+      "name": "List Models",
+      "description": "Documentation: List Models. Topics: beta, models, list",
+      "url": "https://platform.claude.com/docs/en/api/beta/models/list",
+      "keywords": [
+        "beta",
+        "models",
+        "list"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -313,42 +1023,14 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_beta_skills_list",
-      "name": "List Skills",
-      "description": "Documentation: List Skills. Topics: beta, skills, list",
-      "url": "https://platform.claude.com/docs/en/api/beta/skills/list",
+      "tool_id": "anthropic_en_agent_sdk_permissions",
+      "name": "Configure permissions",
+      "description": "Documentation: Configure permissions. Topics: agent, sdk, permissions",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/permissions",
       "keywords": [
-        "beta",
-        "skills",
-        "list"
-      ],
-      "parent_source": "anthropic",
-      "content": null
-    },
-    {
-      "tool_id": "anthropic_cookbook_misc_building_evals",
-      "name": "Building evals",
-      "description": "Documentation: Building evals. Topics: cookbook, misc, building, evals",
-      "url": "https://platform.claude.com/cookbook/misc-building-evals",
-      "keywords": [
-        "cookbook",
-        "misc",
-        "building",
-        "evals"
-      ],
-      "parent_source": "anthropic",
-      "content": null
-    },
-    {
-      "tool_id": "anthropic_cookbook_misc_prompt_caching",
-      "name": "Prompt caching through the Claude API",
-      "description": "Documentation: Prompt caching through the Claude API. Topics: cookbook, misc, prompt, caching",
-      "url": "https://platform.claude.com/cookbook/misc-prompt-caching",
-      "keywords": [
-        "cookbook",
-        "misc",
-        "prompt",
-        "caching"
+        "agent",
+        "sdk",
+        "permissions"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -367,13 +1049,14 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_en_api_supported_regions",
-      "name": "Supported regions",
-      "description": "Documentation: Supported regions. Topics: supported, regions",
-      "url": "https://platform.claude.com/docs/en/api/supported-regions",
+      "tool_id": "anthropic_beta_files_delete",
+      "name": "Delete File",
+      "description": "Documentation: Delete File. Topics: beta, files, delete",
+      "url": "https://platform.claude.com/docs/en/api/beta/files/delete",
       "keywords": [
-        "supported",
-        "regions"
+        "beta",
+        "files",
+        "delete"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -405,42 +1088,29 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_en_agent_sdk_cost_tracking",
-      "name": "Tracking Costs and Usage",
-      "description": "Documentation: Tracking Costs and Usage. Topics: agent, sdk, cost, tracking",
-      "url": "https://platform.claude.com/docs/en/agent-sdk/cost-tracking",
+      "tool_id": "anthropic_admin_api_keys_list",
+      "name": "List Api Keys",
+      "description": "Documentation: List Api Keys. Topics: admin, api, keys, list",
+      "url": "https://platform.claude.com/docs/en/api/admin/api_keys/list",
+      "keywords": [
+        "admin",
+        "api",
+        "keys",
+        "list"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_en_agent_sdk_todo_tracking",
+      "name": "Todo Lists",
+      "description": "Documentation: Todo Lists. Topics: agent, sdk, todo, tracking",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/todo-tracking",
       "keywords": [
         "agent",
         "sdk",
-        "cost",
+        "todo",
         "tracking"
-      ],
-      "parent_source": "anthropic",
-      "content": null
-    },
-    {
-      "tool_id": "anthropic_en_build_with_claude_files",
-      "name": "Files API",
-      "description": "Documentation: Files API. Topics: build, with, claude, files",
-      "url": "https://platform.claude.com/docs/en/build-with-claude/files",
-      "keywords": [
-        "build",
-        "with",
-        "claude",
-        "files"
-      ],
-      "parent_source": "anthropic",
-      "content": null
-    },
-    {
-      "tool_id": "anthropic_beta_files_download",
-      "name": "Download File",
-      "description": "Documentation: Download File. Topics: beta, files, download",
-      "url": "https://platform.claude.com/docs/en/api/beta/files/download",
-      "keywords": [
-        "beta",
-        "files",
-        "download"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -460,14 +1130,14 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_beta_models_retrieve",
-      "name": "Get a Model",
-      "description": "Documentation: Get a Model. Topics: beta, models, retrieve",
-      "url": "https://platform.claude.com/docs/en/api/beta/models/retrieve",
+      "tool_id": "anthropic_admin_workspaces_list",
+      "name": "List Workspaces",
+      "description": "Documentation: List Workspaces. Topics: admin, workspaces, list",
+      "url": "https://platform.claude.com/docs/en/api/admin/workspaces/list",
       "keywords": [
-        "beta",
-        "models",
-        "retrieve"
+        "admin",
+        "workspaces",
+        "list"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -487,27 +1157,28 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_messages_batches_list",
-      "name": "List Message Batches",
-      "description": "Documentation: List Message Batches. Topics: messages, batches, list",
-      "url": "https://platform.claude.com/docs/en/api/messages/batches/list",
+      "tool_id": "anthropic_en_build_with_claude_overview",
+      "name": "Features overview",
+      "description": "Documentation: Features overview. Topics: build, with, claude, overview",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/overview",
       "keywords": [
-        "messages",
-        "batches",
-        "list"
+        "build",
+        "with",
+        "claude",
+        "overview"
       ],
       "parent_source": "anthropic",
       "content": null
     },
     {
-      "tool_id": "anthropic_api_messages_count_tokens",
-      "name": "Count tokens in a Message",
-      "description": "Documentation: Count tokens in a Message. Topics: messages, count, tokens",
-      "url": "https://platform.claude.com/docs/en/api/messages/count_tokens",
+      "tool_id": "anthropic_admin_organizations_me",
+      "name": "Get Current Organization",
+      "description": "Documentation: Get Current Organization. Topics: admin, organizations, me",
+      "url": "https://platform.claude.com/docs/en/api/admin/organizations/me",
       "keywords": [
-        "messages",
-        "count",
-        "tokens"
+        "admin",
+        "organizations",
+        "me"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -521,19 +1192,6 @@
         "messages",
         "batches",
         "cancel"
-      ],
-      "parent_source": "anthropic",
-      "content": null
-    },
-    {
-      "tool_id": "anthropic_messages_batches_create",
-      "name": "Create a Message Batch",
-      "description": "Documentation: Create a Message Batch. Topics: messages, batches, create",
-      "url": "https://platform.claude.com/docs/en/api/messages/batches/create",
-      "keywords": [
-        "messages",
-        "batches",
-        "create"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -554,15 +1212,28 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_en_agent_sdk_secure_deployment",
-      "name": "Securely deploying AI agents",
-      "description": "Documentation: Securely deploying AI agents. Topics: agent, sdk, secure, deployment",
-      "url": "https://platform.claude.com/docs/en/agent-sdk/secure-deployment",
+      "tool_id": "anthropic_messages_batches_create",
+      "name": "Create a Message Batch",
+      "description": "Documentation: Create a Message Batch. Topics: messages, batches, create",
+      "url": "https://platform.claude.com/docs/en/api/messages/batches/create",
       "keywords": [
-        "agent",
-        "sdk",
-        "secure",
-        "deployment"
+        "messages",
+        "batches",
+        "create"
+      ],
+      "parent_source": "anthropic",
+      "content": null
+    },
+    {
+      "tool_id": "anthropic_admin_api_keys_retrieve",
+      "name": "Get Api Key",
+      "description": "Documentation: Get Api Key. Topics: admin, api, keys, retrieve",
+      "url": "https://platform.claude.com/docs/en/api/admin/api_keys/retrieve",
+      "keywords": [
+        "admin",
+        "api",
+        "keys",
+        "retrieve"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -582,29 +1253,15 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_en_build_with_claude_embeddings",
-      "name": "Embeddings",
-      "description": "Documentation: Embeddings. Topics: build, with, claude, embeddings",
-      "url": "https://platform.claude.com/docs/en/build-with-claude/embeddings",
+      "tool_id": "anthropic_en_agent_sdk_secure_deployment",
+      "name": "Securely deploying AI agents",
+      "description": "Documentation: Securely deploying AI agents. Topics: agent, sdk, secure, deployment",
+      "url": "https://platform.claude.com/docs/en/agent-sdk/secure-deployment",
       "keywords": [
-        "build",
-        "with",
-        "claude",
-        "embeddings"
-      ],
-      "parent_source": "anthropic",
-      "content": null
-    },
-    {
-      "tool_id": "anthropic_about_claude_models_overview",
-      "name": "Models overview",
-      "description": "Documentation: Models overview. Topics: about, claude, models, overview",
-      "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
-      "keywords": [
-        "about",
-        "claude",
-        "models",
-        "overview"
+        "agent",
+        "sdk",
+        "secure",
+        "deployment"
       ],
       "parent_source": "anthropic",
       "content": null
@@ -624,14 +1281,15 @@
       "content": null
     },
     {
-      "tool_id": "anthropic_messages_batches_results",
-      "name": "Retrieve Message Batch results",
-      "description": "Documentation: Retrieve Message Batch results. Topics: messages, batches, results",
-      "url": "https://platform.claude.com/docs/en/api/messages/batches/results",
+      "tool_id": "anthropic_en_build_with_claude_embeddings",
+      "name": "Embeddings",
+      "description": "Documentation: Embeddings. Topics: build, with, claude, embeddings",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/embeddings",
       "keywords": [
-        "messages",
-        "batches",
-        "results"
+        "build",
+        "with",
+        "claude",
+        "embeddings"
       ],
       "parent_source": "anthropic",
       "content": null

@@ -90,11 +90,14 @@ class SitemapParser:
             for sitemap_url in sitemap_urls:
                 try:
                     resp = await client.get(sitemap_url)
-                    if resp.status_code == 200 and 'xml' in resp.headers.get('content-type', ''):
-                        pages = self._parse_sitemap_xml(resp.text)
-                        if pages:
-                            logger.info(f"Found {len(pages)} pages in {sitemap_url}")
-                            return pages
+                    # Accept any 200 response that looks like XML (some servers return wrong content-type)
+                    if resp.status_code == 200:
+                        content = resp.text
+                        if content.strip().startswith('<?xml') or '<urlset' in content[:500]:
+                            pages = self._parse_sitemap_xml(content)
+                            if pages:
+                                logger.info(f"Found {len(pages)} pages in {sitemap_url}")
+                                return pages
                 except Exception as e:
                     logger.debug(f"Failed to fetch {sitemap_url}: {e}")
                     continue
@@ -270,24 +273,30 @@ class SitemapParser:
         if parsed.netloc != self.parsed_url.netloc:
             return False
         
-        # Skip non-doc pages
+        path = parsed.path.rstrip('/')
+        
+        # Skip root and non-doc pages (exact path matches)
+        skip_exact = {'', '/search', '/playground', '/404', '/500'}
+        if path in skip_exact:
+            return False
+        
+        # Skip pages containing these patterns
         skip_patterns = [
             '/blog/', '/news/', '/changelog/', '/release',
             '/auth/', '/login/', '/signup/', '/pricing/',
             '/about/', '/contact/', '/careers/', '/jobs/',
-            '/search', '/404', '/500',
             '.pdf', '.zip', '.tar', '.gz',
             '#', '?'
         ]
         
-        path_lower = parsed.path.lower()
+        path_lower = path.lower()
         for pattern in skip_patterns:
             if pattern in path_lower:
                 return False
         
         # Must be under our base path (if specified)
         base_path = self.parsed_url.path.rstrip('/')
-        if base_path and not parsed.path.startswith(base_path):
+        if base_path and not path.startswith(base_path):
             return False
         
         return True

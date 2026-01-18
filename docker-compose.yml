@@ -75,6 +75,8 @@ services:
     restart: unless-stopped
 
   # MCP Server (for standalone testing)
+  # Note: This is primarily for testing. In production, the MCP server
+  # runs as a stdio process started by the MCP client (VS Code, etc.)
   mcp-server:
     build:
       context: .
@@ -82,15 +84,19 @@ services:
     environment:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - REDIS_URL=redis://redis:6379
+      - DOC2MCP_CACHE_DIR=/app/.doc2mcp_cache
     volumes:
       - ./doc2mcp:/app/doc2mcp
       - ./doc_cache.json:/app/doc_cache.json
       - ./tools.yaml:/app/tools.yaml
+      - ./.doc2mcp_cache:/app/.doc2mcp_cache
     depends_on:
       - redis
     networks:
       - doc2mcp
-    restart: unless-stopped
+    restart: "no"
+    profiles:
+      - mcp-test
     command: python -m doc2mcp.server
 
 volumes:

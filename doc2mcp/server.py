@@ -145,16 +145,22 @@ async def run_server() -> None:
     _registry = get_registry(cache_dir)
     
     # Auto-index sources from config if not already indexed
+    existing_sources = _registry.list_sources()
+    logger.info(f"Existing cached sources: {list(existing_sources.keys())}")
+    
     for tool_id, tool_config in config.tools.items():
-        if tool_id not in _registry.list_sources():
-            for source in tool_config.sources:
-                if source.type == "web" and source.url:
-                    logger.info(f"Indexing {tool_id} from {source.url}")
-                    try:
-                        await _registry.add_source(tool_id, source.url)
-                    except Exception as e:
-                        logger.warning(f"Failed to index {tool_id}: {e}")
-                    break  # Only index first web source
+        if tool_id in existing_sources:
+            logger.info(f"Skipping {tool_id} - already indexed with {existing_sources[tool_id]} tools")
+            continue
+            
+        for source in tool_config.sources:
+            if source.type == "web" and source.url:
+                logger.info(f"Indexing new source {tool_id} from {source.url}")
+                try:
+                    await _registry.add_source(tool_id, source.url)
+                except Exception as e:
+                    logger.warning(f"Failed to index {tool_id}: {e}")
+                break  # Only index first web source
     
     total_tools = len(_registry.get_all_tools())
     logger.info(f"Registry has {total_tools} granular tools")
