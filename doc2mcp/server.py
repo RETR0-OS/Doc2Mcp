@@ -1,8 +1,4 @@
-"""Doc2MCP - MCP server for tool documentation search.
-
-This server exposes tools for AI agents to search documentation
-for various tools and APIs.
-"""
+"""Doc2MCP - MCP server for tool documentation search."""
 
 import asyncio
 import logging
@@ -16,21 +12,17 @@ from mcp.types import TextContent, Tool
 
 from doc2mcp.agents.doc_search import DocSearchAgent
 from doc2mcp.config import load_config
+from doc2mcp.handlers import handle_list_tools, handle_search_docs
 from doc2mcp.tracing.phoenix import init_tracing
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("doc2mcp")
 
-# Create MCP server instance
 server = Server("doc2mcp")
-
-# Global agent instance (initialized on startup)
 _agent: DocSearchAgent | None = None
 
 
 def get_agent() -> DocSearchAgent:
-    """Get the doc search agent instance."""
     if _agent is None:
         raise RuntimeError("Agent not initialized")
     return _agent
@@ -88,64 +80,10 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     agent = get_agent()
 
     if name == "search_docs":
-        tool_name = arguments.get("tool_name", "")
-        query = arguments.get("query", "")
-
-        if not tool_name or not query:
-            return [
-                TextContent(
-                    type="text",
-                    text="Error: Both 'tool_name' and 'query' are required.",
-                )
-            ]
-
-        logger.info(f"Searching docs for '{tool_name}': {query}")
-        result = await agent.search(tool_name=tool_name, query=query)
-
-        if result.get("error"):
-            error_msg = result["error"]
-            if result.get("available_tools"):
-                error_msg += f"\nAvailable tools: {', '.join(result['available_tools'])}"
-            return [TextContent(type="text", text=f"Error: {error_msg}")]
-
-        # Format response
-        tool_info = result.get("tool", {})
-        sources = result.get("sources", [])
-        content = result.get("content", "No content found.")
-        pages_explored = result.get("pages_explored", 0)
-
-        response_text = f"""# Documentation: {tool_info.get('name', tool_name)}
-
-{tool_info.get('description', '')}
-
-## Relevant Documentation
-
-{content}
-
----
-**Sources:** {', '.join(sources)}
-**Pages explored:** {pages_explored}
-"""
-        return [TextContent(type="text", text=response_text)]
-
+        logger.info(f"Searching docs for '{arguments.get('tool_name')}': {arguments.get('query')}")
+        return await handle_search_docs(agent, arguments)
     elif name == "list_available_tools":
-        tools = await agent.list_tools()
-
-        if not tools:
-            return [
-                TextContent(
-                    type="text",
-                    text="No tools configured. Add tools to tools.yaml to get started.",
-                )
-            ]
-
-        lines = ["# Available Tools\n"]
-        for tool in tools:
-            lines.append(f"- **{tool['id']}**: {tool['name']}")
-            lines.append(f"  {tool['description']}\n")
-
-        return [TextContent(type="text", text="\n".join(lines))]
-
+        return await handle_list_tools(agent)
     else:
         return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
@@ -154,56 +92,33 @@ async def run_server() -> None:
     """Run the MCP server."""
     global _agent
 
-    # Initialize tracing
-    logger.info("Initializing Arize Phoenix tracing...")
     init_tracing("doc2mcp")
 
-    # Load configuration
+    # Find config file
     config_path = os.environ.get("TOOLS_CONFIG_PATH")
-    if config_path:
-        logger.info(f"Loading config from: {config_path}")
-    else:
-        # Look for tools.yaml in current dir or package dir
-        default_paths = [
-            Path("./tools.yaml"),
-            Path(__file__).parent.parent / "tools.yaml",
-        ]
-        for path in default_paths:
+    if not config_path:
+        for path in [Path("./tools.yaml"), Path(__file__).parent.parent / "tools.yaml"]:
             if path.exists():
                 config_path = str(path)
                 break
 
     config = load_config(config_path)
-    logger.info(f"Loaded {len(config.tools)} tools from config")
+    logger.info(f"Loaded {len(config.tools)} tools")
 
-    # Initialize agent
     _agent = DocSearchAgent(config)
-    logger.info("Doc search agent initialized")
 
-    # Run the stdio server
-    logger.info("Starting Doc2MCP server...")
     async with stdio_server() as (read_stream, write_stream):
-        await server.run(
-            read_stream,
-            write_stream,
-            server.create_initialization_options(),
-        )
+        await server.run(read_stream, write_stream, server.create_initialization_options())
 
-    # Cleanup
     await _agent.close()
 
 
 def main() -> None:
     """Entry point for the server."""
-    # Load environment variables from .env files
-    # Try .env.local first, then .env
-    env_local = Path(".env.local")
-    env_file = Path(".env")
-
-    if env_local.exists():
-        load_dotenv(env_local)
-    elif env_file.exists():
-        load_dotenv(env_file)
+    for env_path in [Path(".env.local"), Path(".env")]:
+        if env_path.exists():
+            load_dotenv(env_path)
+            break
 
     asyncio.run(run_server())
 

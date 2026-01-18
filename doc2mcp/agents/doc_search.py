@@ -5,7 +5,8 @@ import os
 from typing import Any
 from urllib.parse import urlparse
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from opentelemetry import trace
 
 from doc2mcp.cache import PageCache
@@ -46,19 +47,15 @@ class DocSearchAgent:
         if not api_key:
             raise ValueError("GOOGLE_API_KEY environment variable is required")
 
-        genai.configure(api_key=api_key)
+        self.client = genai.Client(api_key=api_key)
 
-        # Model for navigation decisions (fast, cheap)
-        self.nav_model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
-            system_instruction=self._get_navigation_prompt(),
-        )
+        # Model configuration for navigation decisions (fast, cheap)
+        self.nav_model_name = "gemini-2.0-flash-exp"
+        self.nav_system_instruction = self._get_navigation_prompt()
 
-        # Model for final answer synthesis
-        self.synthesis_model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
-            system_instruction=self._get_synthesis_prompt(),
-        )
+        # Model configuration for final answer synthesis
+        self.synthesis_model_name = "gemini-2.0-flash-exp"
+        self.synthesis_system_instruction = self._get_synthesis_prompt()
 
         self.tracer = trace.get_tracer("doc2mcp.agent")
 
@@ -350,9 +347,11 @@ Analyze this page and respond with a JSON object."""
             span.set_attribute("url", fetch_result.url)
 
             try:
-                response = await self.nav_model.generate_content_async(
-                    prompt,
-                    generation_config=genai.GenerationConfig(
+                response = await self.client.aio.models.generate_content(
+                    model=self.nav_model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=self.nav_system_instruction,
                         max_output_tokens=4096,
                         temperature=0.1,
                         response_mime_type="application/json",
@@ -363,7 +362,7 @@ Analyze this page and respond with a JSON object."""
 
                 # Trace the call
                 trace_llm_call(
-                    model="gemini-2.0-flash",
+                    model=self.nav_model_name,
                     messages=[{"role": "user", "content": prompt[:500]}],
                     response=result_text[:500],
                     tokens_in=getattr(
@@ -421,9 +420,11 @@ Documentation excerpts found:
 Please synthesize a comprehensive answer to the query using the documentation above. Include code examples if available."""
 
         with self.tracer.start_as_current_span("synthesis") as span:
-            response = await self.synthesis_model.generate_content_async(
-                prompt,
-                generation_config=genai.GenerationConfig(
+            response = await self.client.aio.models.generate_content(
+                model=self.synthesis_model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=self.synthesis_system_instruction,
                     max_output_tokens=8192,
                     temperature=0.1,
                 ),
@@ -432,7 +433,7 @@ Please synthesize a comprehensive answer to the query using the documentation ab
             result = response.text
 
             trace_llm_call(
-                model="gemini-2.0-flash",
+                model=self.synthesis_model_name,
                 messages=[{"role": "user", "content": prompt[:500]}],
                 response=result[:500],
                 tokens_in=getattr(
